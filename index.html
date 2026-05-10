@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Close Reader — Create Session</title>
+<title>Close Reader</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
@@ -18,9 +18,7 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { border-top: 3px solid var(--red); }
-
   body {
     font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg);
@@ -29,58 +27,78 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Header ─────────────────────────────────────────────────────────────── */
+  /* ── Shared header ─────────────────────────────────────────────────────────── */
   header {
-    padding: 36px 56px 32px;
+    padding: 28px 56px 24px;
     border-bottom: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
   }
-
   .header-wordmark {
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--mid); margin-bottom: 10px;
+    color: var(--mid);
   }
-
-  .header-title {
-    font-size: 42px; font-weight: 800;
-    color: var(--ink); line-height: 1.0;
-    letter-spacing: -0.025em;
+  .header-room {
+    display: none;
+    align-items: center;
+    gap: 14px;
   }
-
-  .header-sub {
-    font-size: 14px; color: var(--mid);
-    margin-top: 10px; font-weight: 400;
-    letter-spacing: -0.005em;
+  .header-room.show { display: flex; }
+  .room-code-badge {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--mid);
   }
+  .room-code-badge span {
+    font-size: 18px; font-weight: 800;
+    color: var(--ink); letter-spacing: 0.06em;
+    margin-left: 6px;
+  }
+  .sync-pill {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--mid);
+  }
+  .sync-pill.ok  { color: #16A34A; border-color: #16A34A; }
+  .sync-pill.err { color: var(--red); border-color: var(--red); }
 
-  /* ── Main ───────────────────────────────────────────────────────────────── */
-  main {
-    max-width: 800px;
+  /* ── Views ─────────────────────────────────────────────────────────────────── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── Landing view ──────────────────────────────────────────────────────────── */
+  #landingView {
+    max-width: 480px;
     margin: 0 auto;
-    padding: 52px 56px 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
+    padding: 72px 56px 96px;
+  }
+  .landing-title {
+    font-size: 48px; font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.0;
+    margin-bottom: 36px;
+  }
+  .landing-title em {
+    font-style: normal;
+    color: var(--red);
   }
 
-  /* ── Form ───────────────────────────────────────────────────────────────── */
   .form-group {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 8px;
+    margin-bottom: 20px;
   }
-
   .field-label {
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--mid);
   }
-
-  input[type="text"], textarea {
+  input[type="text"], input[type="password"], textarea {
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--ink);
@@ -93,278 +111,437 @@
     transition: border-color 0.12s;
     -webkit-font-smoothing: antialiased;
   }
+  input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+    border-color: var(--red);
+  }
+  textarea { min-height: 180px; resize: vertical; line-height: 1.6; }
 
-  input[type="text"]:focus, textarea:focus { border-color: var(--red); }
-
-  textarea {
-    min-height: 200px;
-    resize: vertical;
-    line-height: 1.6;
+  .code-input {
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
   }
 
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  hr { border: none; border-top: 1px solid var(--faint); }
-
-  /* ── Tags ───────────────────────────────────────────────────────────────── */
-  .tags-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .tag-chip {
+  .teacher-toggle-row {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .teacher-toggle-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+  .teacher-toggle-row .toggle-label {
+    font-size: 13px; font-weight: 600; color: var(--mid);
+  }
+
+  .pw-group { display: none; }
+  .pw-group.show { display: flex; }
+
+  .btn-join {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 15px;
+    background: var(--ink);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    margin-top: 8px;
+  }
+  .btn-join:hover { opacity: 0.7; }
+  .btn-join:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .landing-note {
+    font-size: 12px; color: var(--mid);
+    margin-top: 18px; line-height: 1.7;
+  }
+
+  /* ── Room view layout ──────────────────────────────────────────────────────── */
+  #roomView { display: none; }
+  #roomView.active { display: grid; }
+  #roomView {
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: auto 1fr;
+    min-height: calc(100vh - 73px);
+  }
+
+  /* ── Edit panel (teacher) ──────────────────────────────────────────────────── */
+  #editPanel {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 56px;
+  }
+  #editPanel.open {
+    max-height: 900px;
+    padding: 36px 56px;
+  }
+  .ep-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .ep-heading {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 4px;
+  }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .tags-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag-chip {
+    display: flex; align-items: center; gap: 7px;
     padding: 6px 12px;
     border: 1px solid var(--border);
     cursor: pointer;
     font-family: 'Inter', sans-serif;
     font-size: 11px; font-weight: 600;
     letter-spacing: 0.07em; text-transform: uppercase;
-    background: var(--bg);
-    color: var(--ink);
-    transition: all 0.12s;
-    user-select: none;
+    background: var(--bg); color: var(--ink);
+    transition: all 0.12s; user-select: none;
   }
-
-  .chip-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%; flex-shrink: 0;
-  }
-
-  .tag-chip.selected { background: var(--surface); border-color: var(--ink); }
-  .tag-chip:not(.selected) { opacity: 0.38; }
+  .chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .tag-chip.selected { background: var(--bg); border-color: var(--ink); }
+  .tag-chip:not(.selected) { opacity: 0.35; }
   .tag-chip:hover { opacity: 1; }
 
   .custom-tag-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-top: 10px;
+    display: flex; gap: 8px; align-items: center; margin-top: 6px;
   }
-
   .custom-tag-row input[type="text"] {
-    max-width: 210px;
-    padding: 8px 12px;
-    font-size: 13px;
+    max-width: 200px; padding: 8px 12px; font-size: 13px;
   }
-
   .btn-sm {
     font-family: 'Inter', sans-serif;
     font-size: 11px; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
     padding: 8px 16px;
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--mid);
-    cursor: pointer;
-    transition: all 0.12s;
-    white-space: nowrap;
+    background: none; border: 1px solid var(--border);
+    color: var(--mid); cursor: pointer; transition: all 0.12s; white-space: nowrap;
   }
-
   .btn-sm:hover { border-color: var(--ink); color: var(--ink); }
 
-  /* ── Preview ────────────────────────────────────────────────────────────── */
   .preview-box {
-    background: var(--surface);
-    border: 1px solid var(--faint);
-    padding: 20px 22px;
-    max-height: 200px;
-    overflow-y: auto;
-    line-height: 2;
+    background: var(--bg); border: 1px solid var(--faint);
+    padding: 16px 18px; max-height: 160px; overflow-y: auto; line-height: 2;
   }
-
-  .preview-phrase {
-    display: inline;
-    padding: 1px 3px;
-    font-size: 14px;
-  }
-
+  .preview-phrase { display: inline; padding: 1px 3px; font-size: 13px; }
   .preview-phrase:nth-child(even) { background: rgba(0,0,0,0.05); }
+  .preview-count { font-size: 11px; color: var(--mid); margin-top: 6px; }
 
-  .preview-count {
-    font-size: 11px; color: var(--mid);
-    margin-top: 8px; letter-spacing: 0.04em;
-  }
-
-  /* ── Create button ──────────────────────────────────────────────────────── */
-  .btn-create {
+  .ep-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-publish {
     font-family: 'Inter', sans-serif;
     font-size: 12px; font-weight: 700;
     letter-spacing: 0.12em; text-transform: uppercase;
-    padding: 15px 44px;
-    background: var(--ink);
-    border: none;
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    align-self: flex-start;
+    padding: 13px 36px;
+    background: var(--ink); border: none;
+    color: #fff; cursor: pointer; transition: opacity 0.15s;
   }
+  .btn-publish:hover { opacity: 0.7; }
+  .btn-publish:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  .btn-create:hover { opacity: 0.7; }
-  .btn-create:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  /* ── Success panel ──────────────────────────────────────────────────────── */
-  .session-created {
+  .ep-toggle {
     display: none;
-    flex-direction: column;
-    gap: 22px;
-    border-left: 3px solid var(--red);
-    padding: 28px 32px;
+    position: fixed;
+    bottom: 28px; left: 50%; transform: translateX(-50%);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 11px 24px;
+    background: var(--ink); border: none;
+    color: #fff; cursor: pointer; z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    transition: opacity 0.15s;
+  }
+  .ep-toggle.show { display: block; }
+  .ep-toggle:hover { opacity: 0.75; }
+
+  /* ── Text panel ────────────────────────────────────────────────────────────── */
+  #textPanel {
+    padding: 48px 56px 80px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+  }
+  .reading-meta { margin-bottom: 32px; }
+  .reading-title {
+    font-size: 28px; font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.15;
+    margin-bottom: 6px;
+  }
+  .reading-source {
+    font-size: 13px; color: var(--mid); font-style: italic;
+  }
+
+  #phrasesContainer {
+    line-height: 2.5;
+    font-size: 18px;
+  }
+  .phrase-wrap { display: inline; }
+  .phrase {
+    display: inline;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: background 0.12s;
+    position: relative;
+  }
+  .phrase:hover { background: var(--surface); }
+  .phrase.active { background: #FEF3C7; }
+  .phrase.annotated { border-bottom: 2px solid var(--red); }
+
+  .phrase-dots {
+    display: inline-flex; gap: 2px;
+    vertical-align: super;
+    font-size: 0;
+    margin-left: 2px;
+  }
+  .pdot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .empty-state {
+    color: var(--mid); font-size: 15px;
+    padding: 40px 0; line-height: 1.7;
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────────────────────────── */
+  #sidebar {
     background: var(--surface);
+    padding: 32px 28px 80px;
+    overflow-y: auto;
+  }
+  .sidebar-prompt {
+    font-size: 13px; color: var(--mid);
+    line-height: 1.7; margin-bottom: 24px;
   }
 
-  .session-created.show { display: flex; }
-
-  .created-heading {
-    font-size: 22px; font-weight: 800;
-    color: var(--ink); letter-spacing: -0.02em;
+  /* annotation form */
+  .ann-phrase-text {
+    font-size: 14px; font-weight: 600;
+    line-height: 1.5; color: var(--ink);
+    padding: 12px 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    margin-bottom: 16px;
   }
 
-  .link-row { display: flex; flex-direction: column; gap: 7px; }
+  .ann-tags-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+  .ann-tag {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    background: var(--bg); color: var(--mid);
+    transition: all 0.1s; user-select: none;
+  }
+  .ann-tag.sel {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+  .ann-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-  .link-label {
+  .ann-note {
+    width: 100%;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--ink); padding: 10px 12px;
+    font-family: 'Inter', sans-serif; font-size: 13px;
+    outline: none; resize: none; min-height: 80px;
+    margin-bottom: 12px; line-height: 1.6; border-radius: 0;
+  }
+  .ann-note:focus { border-color: var(--red); }
+
+  .btn-save {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 12px;
+    background: var(--red); border: none;
+    color: #fff; cursor: pointer; transition: opacity 0.15s;
+  }
+  .btn-save:hover { opacity: 0.82; }
+
+  /* class annotations list */
+  .class-ann-heading {
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--mid);
+    color: var(--mid); margin: 24px 0 12px;
+    padding-top: 20px; border-top: 1px solid var(--border);
   }
-
-  .link-box { display: flex; gap: 8px; align-items: stretch; }
-
-  .link-url {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 10px 14px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    color: var(--ink);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+  .class-ann-item {
+    background: var(--bg); border: 1px solid var(--faint);
+    padding: 12px 14px; margin-bottom: 8px;
   }
-
-  .btn-copy {
-    font-family: 'Inter', sans-serif;
+  .cai-name {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 6px;
+  }
+  .cai-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .cai-tag {
     font-size: 10px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 10px 14px;
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--mid);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.12s;
-    flex-shrink: 0;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid currentColor;
   }
+  .cai-note { font-size: 13px; color: var(--ink); line-height: 1.55; }
 
-  .btn-copy:hover { border-color: var(--ink); color: var(--ink); }
-
-  .btn-open {
+  /* teacher export */
+  .teacher-tools {
+    margin-top: 32px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-export {
     font-family: 'Inter', sans-serif;
-    font-size: 12px; font-weight: 700;
+    font-size: 11px; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 13px 28px;
-    background: var(--ink);
-    border: none;
-    color: #FFFFFF;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 2px;
-    transition: opacity 0.15s;
-    align-self: flex-start;
+    padding: 10px 18px;
+    background: none; border: 1px solid var(--border);
+    color: var(--mid); cursor: pointer; transition: all 0.12s;
   }
+  .btn-export:hover { border-color: var(--ink); color: var(--ink); }
 
-  .btn-open:hover { opacity: 0.7; }
-
-  .help-note {
-    font-size: 13px; color: var(--mid);
-    line-height: 1.65;
+  @media (max-width: 720px) {
+    header { padding: 20px 24px; }
+    #landingView { padding: 48px 24px 72px; }
+    #roomView { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
+    #textPanel { padding: 32px 24px 60px; border-right: none; border-bottom: 1px solid var(--border); }
+    #sidebar { padding: 24px 24px 60px; }
+    #editPanel.open { padding: 24px; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <div class="header-wordmark">Close Reader</div>
-    <div class="header-title">Create a<br>Reading Session</div>
-    <div class="header-sub">Upload any text. Students annotate in real time.</div>
+  <div class="header-wordmark">Close Reader</div>
+  <div class="header-room" id="headerRoom">
+    <div class="room-code-badge">Room<span id="headerCode"></span></div>
+    <div class="sync-pill" id="syncPill">Live</div>
   </div>
 </header>
 
-<main>
-  <div class="two-col">
-    <div class="form-group">
-      <div class="field-label">Title</div>
-      <input type="text" id="titleInput" placeholder="e.g. The Metamorphosis — Opening" />
-    </div>
-    <div class="form-group">
-      <div class="field-label">Author / Source</div>
-      <input type="text" id="sourceInput" placeholder="e.g. Franz Kafka, 1915" />
-    </div>
+<!-- ── LANDING VIEW ──────────────────────────────────────────────────────────── -->
+<div class="view active" id="landingView">
+  <div class="landing-title">Close<br><em>Reader.</em></div>
+
+  <div class="form-group">
+    <div class="field-label">Room Code</div>
+    <input class="code-input" type="text" id="inCode" maxlength="8"
+      placeholder="e.g. HIST101"
+      oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" />
   </div>
 
   <div class="form-group">
-    <div class="field-label">Text</div>
-    <textarea id="textInput" placeholder="Paste any paragraph, excerpt, or passage. It will be automatically split into clickable phrases."></textarea>
+    <div class="field-label">Your Name</div>
+    <input type="text" id="inName" placeholder="First name or nickname" />
   </div>
 
-  <div class="form-group">
-    <div class="field-label">Phrase preview</div>
-    <div class="preview-box" id="previewBox">
-      <span style="color:var(--border);font-size:13px;">Paste text above to see a preview.</span>
-    </div>
-    <div class="preview-count" id="previewCount"></div>
+  <label class="teacher-toggle-row">
+    <input type="checkbox" id="inTeacher" onchange="onTeacherToggle()" />
+    <span class="toggle-label">I'm the teacher</span>
+  </label>
+
+  <div class="form-group pw-group" id="pwGroup">
+    <div class="field-label">Teacher Password</div>
+    <input type="password" id="inPw" placeholder="Set or enter room password" />
   </div>
 
-  <div class="form-group">
-    <div class="field-label">Tags — click to toggle</div>
-    <div class="tags-grid" id="tagsGrid"></div>
-    <div class="custom-tag-row">
-      <input type="text" id="customTagInput" placeholder="Custom tag name..." />
-      <button class="btn-sm" onclick="addCustomTag()">+ Add</button>
-    </div>
+  <button class="btn-join" id="joinBtn" onclick="joinRoom()">Enter Room →</button>
+
+  <div class="landing-note">
+    Teachers: check the box above, enter any password to create the room.<br>
+    Students: just enter the room code and your name.
   </div>
+</div>
 
-  <hr />
+<!-- ── ROOM VIEW ─────────────────────────────────────────────────────────────── -->
+<div class="view" id="roomView">
 
-  <button class="btn-create" id="createBtn" onclick="createSession()">Create Session →</button>
-
-  <div class="session-created" id="sessionCreated">
-    <div class="created-heading">Session ready.</div>
-
-    <div class="link-row">
-      <div class="link-label">Student link — share with your class</div>
-      <div class="link-box">
-        <div class="link-url" id="studentLink"></div>
-        <button class="btn-copy" onclick="copyLink('studentLink', this)">Copy</button>
+  <!-- edit panel (teacher only) -->
+  <div id="editPanel">
+    <div class="ep-inner">
+      <div class="ep-heading">Edit Reading</div>
+      <div class="two-col">
+        <div class="form-group">
+          <div class="field-label">Title</div>
+          <input type="text" id="epTitle" placeholder="e.g. The Metamorphosis" />
+        </div>
+        <div class="form-group">
+          <div class="field-label">Author / Source</div>
+          <input type="text" id="epSource" placeholder="e.g. Franz Kafka, 1915" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="field-label">Text</div>
+        <textarea id="epText" placeholder="Paste any excerpt. It will be split into clickable phrases."
+          oninput="renderEpPreview()"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="field-label">Preview</div>
+        <div class="preview-box" id="epPreviewBox">
+          <span style="color:var(--border);font-size:13px;">Paste text to preview.</span>
+        </div>
+        <div class="preview-count" id="epPreviewCount"></div>
+      </div>
+      <div class="form-group">
+        <div class="field-label">Tags — click to toggle</div>
+        <div class="tags-grid" id="epTagsGrid"></div>
+        <div class="custom-tag-row">
+          <input type="text" id="epCustomTag" placeholder="Custom tag..." />
+          <button class="btn-sm" onclick="addCustomTag()">+ Add</button>
+        </div>
+      </div>
+      <div class="ep-actions">
+        <button class="btn-publish" id="publishBtn" onclick="publishReading()">Publish →</button>
       </div>
     </div>
+  </div>
 
-    <div class="link-row">
-      <div class="link-label">Teacher link — keep private</div>
-      <div class="link-box">
-        <div class="link-url" id="teacherLink"></div>
-        <button class="btn-copy" onclick="copyLink('teacherLink', this)">Copy</button>
-      </div>
+  <!-- text panel -->
+  <div id="textPanel">
+    <div class="reading-meta">
+      <div class="reading-title" id="readingTitle">Loading…</div>
+      <div class="reading-source" id="readingSource"></div>
     </div>
-
-    <a class="btn-open" id="openSession" target="_blank">Open Teacher View →</a>
-
-    <div class="help-note">
-      Students enter their name when they first open the session. All annotations sync live — no refresh needed.
+    <div id="phrasesContainer">
+      <div class="empty-state">Waiting for the teacher to publish a reading.</div>
     </div>
   </div>
-</main>
+
+  <!-- sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-prompt" id="sidebarPrompt">
+      Click any phrase in the text to annotate it.
+    </div>
+    <div id="annotationForm" style="display:none">
+      <div class="ann-phrase-text" id="annPhraseText"></div>
+      <div class="ann-tags-grid" id="annTagsGrid"></div>
+      <textarea class="ann-note" id="annNote" placeholder="Optional note…"></textarea>
+      <button class="btn-save" onclick="saveAnnotation()">Save →</button>
+    </div>
+    <div id="classAnns"></div>
+    <div class="teacher-tools" id="teacherTools" style="display:none">
+      <button class="btn-export" onclick="exportData()">Export JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- floating edit toggle (teacher) -->
+<button class="ep-toggle" id="epToggle" onclick="toggleEditPanel()">Edit Reading</button>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -378,11 +555,22 @@ const firebaseConfig = {
   messagingSenderId: "785542219599",
   appId: "1:785542219599:web:615b79b65ed3af1159a73a"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ── Default tags ──────────────────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────────────────
+let ROOM_ID = null;
+let MY_ID   = null;
+let MY_NAME = null;
+let IS_TEACHER = false;
+
+let currentPhrases  = [];
+let currentTags     = [];
+let activePhraseIdx = null;
+let selectedAnnTags = new Set();
+let allAnnotations  = {};
+
+// edit-panel state
 const DEFAULT_TAGS = [
   { id: 'confusing',   label: 'Confusing',   color: '#2563EB' },
   { id: 'interesting', label: 'Interesting',  color: '#EA580C' },
@@ -393,68 +581,39 @@ const DEFAULT_TAGS = [
   { id: 'agree',       label: 'Agree',        color: '#059669' },
   { id: 'disagree',    label: 'Disagree',     color: '#DC2626' },
 ];
-
 const CUSTOM_COLORS = ['#B45309','#6D28D9','#0369A1','#065F46','#9D174D','#1E3A5F'];
+let epSelectedTags = new Set(DEFAULT_TAGS.map(t => t.id));
+let epCustomTags   = [];
+function epAllTags() { return [...DEFAULT_TAGS, ...epCustomTags]; }
 
-let selectedTags = new Set(DEFAULT_TAGS.map(t => t.id));
-let customTags = [];
-
-function getAllTags() {
-  return [...DEFAULT_TAGS, ...customTags];
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-function renderTagsGrid() {
-  const grid = document.getElementById('tagsGrid');
-  grid.innerHTML = getAllTags().map(tag => {
-    const sel = selectedTags.has(tag.id);
-    return `<div class="tag-chip ${sel ? 'selected' : ''}"
-      onclick="toggleTag('${tag.id}')">
-      <span class="chip-dot" style="background:${tag.color}"></span>
-      ${tag.label}
-    </div>`;
-  }).join('');
+function getOrCreateMyId() {
+  let id = localStorage.getItem('closereader_id');
+  if (!id) { id = genId(); localStorage.setItem('closereader_id', id); }
+  return id;
 }
 
-function toggleTag(id) {
-  if (selectedTags.has(id)) {
-    if (selectedTags.size <= 1) return;
-    selectedTags.delete(id);
-  } else {
-    selectedTags.add(id);
-  }
-  renderTagsGrid();
+function setSyncStatus(s) {
+  const pill = document.getElementById('syncPill');
+  if (s === 'ok')  { pill.className = 'sync-pill ok';  pill.textContent = 'Live'; }
+  if (s === 'err') { pill.className = 'sync-pill err'; pill.textContent = 'Error'; }
+  if (s === 'wait'){ pill.className = 'sync-pill';     pill.textContent = '…'; }
 }
-
-function addCustomTag() {
-  const input = document.getElementById('customTagInput');
-  const label = input.value.trim();
-  if (!label || label.length > 30) return;
-  const id = 'c_' + Date.now();
-  const color = CUSTOM_COLORS[customTags.length % CUSTOM_COLORS.length];
-  customTags.push({ id, label, color });
-  selectedTags.add(id);
-  input.value = '';
-  renderTagsGrid();
-}
-
-document.getElementById('customTagInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addCustomTag();
-});
 
 // ── Text splitting ────────────────────────────────────────────────────────────
 function splitText(raw) {
   if (!raw.trim()) return [];
-
   const paragraphs = raw.split(/\n\s*\n/).filter(p => p.trim());
-
   if (paragraphs.length > 1) {
     return paragraphs.map(p => p.replace(/\s+/g, ' ').trim()).filter(Boolean);
   }
-
   const text = raw.replace(/\s+/g, ' ').trim();
   const results = [];
   let i = 0, start = 0;
-
   while (i < text.length) {
     if (/[.!?]/.test(text[i])) {
       let end = i;
@@ -472,95 +631,350 @@ function splitText(raw) {
     }
     i++;
   }
-
   if (start < text.length) {
     const remaining = text.slice(start).trim();
     if (remaining) results.push(remaining);
   }
-
   return results.length > 0 ? results : [text];
 }
 
-function renderPreview() {
-  const phrases = splitText(document.getElementById('textInput').value);
-  const box = document.getElementById('previewBox');
-  const count = document.getElementById('previewCount');
-  if (!phrases.length) {
-    box.innerHTML = '<span style="color:var(--border);font-size:13px;">Paste text above to see a preview.</span>';
-    count.textContent = '';
-    return;
-  }
-  box.innerHTML = phrases.map(p => `<span class="preview-phrase">${p} </span>`).join('');
-  count.textContent = `${phrases.length} phrase${phrases.length !== 1 ? 's' : ''}`;
+// ── Landing ───────────────────────────────────────────────────────────────────
+function onTeacherToggle() {
+  const checked = document.getElementById('inTeacher').checked;
+  document.getElementById('pwGroup').classList.toggle('show', checked);
 }
 
-document.getElementById('textInput').addEventListener('input', renderPreview);
+async function joinRoom() {
+  const code = document.getElementById('inCode').value.trim().toUpperCase();
+  const name = document.getElementById('inName').value.trim();
+  const wantTeacher = document.getElementById('inTeacher').checked;
+  const pw = document.getElementById('inPw').value.trim();
 
-// ── ID / token generators ─────────────────────────────────────────────────────
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
+  if (!code) { alert('Enter a room code.'); return; }
+  if (!name) { alert('Enter your name.'); return; }
+  if (wantTeacher && !pw) { alert('Enter a teacher password.'); return; }
 
-function genToken() {
-  return Array.from({ length: 28 }, () => Math.random().toString(36)[2] || 'a').join('');
-}
-
-// ── Create session ────────────────────────────────────────────────────────────
-async function createSession() {
-  const title  = document.getElementById('titleInput').value.trim()  || 'Untitled Reading';
-  const source = document.getElementById('sourceInput').value.trim() || '';
-  const text   = document.getElementById('textInput').value.trim();
-
-  if (!text) { alert('Paste some text first.'); return; }
-
-  const phrases = splitText(text);
-  if (!phrases.length) { alert('Could not parse text into phrases.'); return; }
-
-  const activeTags = getAllTags().filter(t => selectedTags.has(t.id));
-  const sessionId    = genCode();
-  const teacherToken = genToken();
-
-  const payload = {
-    meta: { title, source, createdAt: Date.now(), teacherToken, tags: activeTags },
-    phrases
-  };
-
-  const btn = document.getElementById('createBtn');
-  btn.disabled = true;
-  btn.textContent = 'Creating...';
+  const btn = document.getElementById('joinBtn');
+  btn.disabled = true; btn.textContent = 'Joining…';
 
   try {
-    await db.ref(`sessions/${sessionId}`).set(payload);
+    const snap = await db.ref(`rooms/${code}/config`).once('value');
+    const config = snap.val();
 
-    const base = window.location.href.replace(/\/[^/]*$/, '');
-    const studentUrl = `${base}/session.html?s=${sessionId}`;
-    const teacherUrl = `${base}/session.html?s=${sessionId}&t=${teacherToken}`;
+    if (!config) {
+      // room doesn't exist
+      if (!wantTeacher) {
+        alert('Room not found. Ask your teacher for the room code.');
+        btn.disabled = false; btn.textContent = 'Enter Room →';
+        return;
+      }
+      // teacher creates room
+      await db.ref(`rooms/${code}/config`).set({ teacherPassword: pw, createdAt: Date.now() });
+      IS_TEACHER = true;
+    } else {
+      // room exists
+      if (wantTeacher) {
+        if (config.teacherPassword !== pw) {
+          alert('Wrong teacher password.');
+          btn.disabled = false; btn.textContent = 'Enter Room →';
+          return;
+        }
+        IS_TEACHER = true;
+      }
+    }
 
-    document.getElementById('studentLink').textContent = studentUrl;
-    document.getElementById('teacherLink').textContent = teacherUrl;
-    document.getElementById('openSession').href = teacherUrl;
-    document.getElementById('sessionCreated').classList.add('show');
-    document.getElementById('sessionCreated').scrollIntoView({ behavior: 'smooth' });
-    btn.textContent = 'Create Another →';
-    btn.disabled = false;
+    ROOM_ID = code;
+    MY_ID   = getOrCreateMyId();
+    MY_NAME = name;
+
+    localStorage.setItem('closereader_room', code);
+    localStorage.setItem('closereader_name', name);
+
+    enterRoom();
   } catch (e) {
-    alert('Error: ' + e.message);
-    btn.disabled = false;
-    btn.textContent = 'Create Session →';
+    alert('Connection error: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Enter Room →';
   }
 }
 
-function copyLink(id, btn) {
-  const url = document.getElementById(id).textContent;
-  navigator.clipboard.writeText(url).then(() => {
-    btn.textContent = 'Copied!';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+// ── Enter room ────────────────────────────────────────────────────────────────
+function enterRoom() {
+  document.getElementById('landingView').classList.remove('active');
+  document.getElementById('roomView').classList.add('active');
+  document.getElementById('headerRoom').classList.add('show');
+  document.getElementById('headerCode').textContent = ROOM_ID;
+
+  if (IS_TEACHER) {
+    document.getElementById('epToggle').classList.add('show');
+    document.getElementById('teacherTools').style.display = 'block';
+    document.getElementById('editPanel').classList.add('open');
+    renderEpTagsGrid();
+  }
+
+  setSyncStatus('wait');
+  subscribeRoom();
+}
+
+// ── Firebase subscriptions ────────────────────────────────────────────────────
+function subscribeRoom() {
+  // content
+  db.ref(`rooms/${ROOM_ID}/content`).on('value', snap => {
+    const data = snap.val();
+    setSyncStatus('ok');
+    if (!data) return;
+    currentPhrases = data.phrases || [];
+    currentTags    = data.tags    || [];
+    document.getElementById('readingTitle').textContent  = data.title  || 'Untitled';
+    document.getElementById('readingSource').textContent = data.source || '';
+    // pre-fill edit panel for teacher
+    if (IS_TEACHER) {
+      document.getElementById('epTitle').value  = data.title  || '';
+      document.getElementById('epSource').value = data.source || '';
+      document.getElementById('epText').value   = data.rawText || '';
+    }
+    renderPhrases();
+  }, () => setSyncStatus('err'));
+
+  // annotations
+  db.ref(`rooms/${ROOM_ID}/annotations`).on('value', snap => {
+    allAnnotations = snap.val() || {};
+    renderPhraseDots();
+    if (activePhraseIdx !== null) renderClassAnns(activePhraseIdx);
   });
 }
 
+// ── Render phrases ────────────────────────────────────────────────────────────
+function renderPhrases() {
+  const container = document.getElementById('phrasesContainer');
+  if (!currentPhrases.length) {
+    container.innerHTML = '<div class="empty-state">Waiting for the teacher to publish a reading.</div>';
+    return;
+  }
+  container.innerHTML = currentPhrases.map((p, i) => {
+    return `<span class="phrase-wrap"><span class="phrase" id="ph${i}" onclick="selectPhrase(${i})">${escHtml(p)}</span><span class="phrase-dots" id="pd${i}"></span> </span>`;
+  }).join('');
+  renderPhraseDots();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderPhraseDots() {
+  currentPhrases.forEach((_, i) => {
+    const dotsEl = document.getElementById(`pd${i}`);
+    if (!dotsEl) return;
+    const anns = allAnnotations[i] || {};
+    const tagCounts = {};
+    Object.values(anns).forEach(a => {
+      (a.tags || []).forEach(tid => { tagCounts[tid] = (tagCounts[tid] || 0) + 1; });
+    });
+    const tagMap = {};
+    currentTags.forEach(t => { tagMap[t.id] = t; });
+    const dots = Object.entries(tagCounts).map(([tid]) => {
+      const color = tagMap[tid] ? tagMap[tid].color : '#888';
+      return `<span class="pdot" style="background:${color}" title="${tid}"></span>`;
+    }).join('');
+    dotsEl.innerHTML = dots;
+
+    const ph = document.getElementById(`ph${i}`);
+    if (ph) {
+      ph.classList.toggle('annotated', Object.keys(anns).length > 0);
+    }
+  });
+}
+
+// ── Phrase selection ──────────────────────────────────────────────────────────
+function selectPhrase(idx) {
+  // deselect old
+  if (activePhraseIdx !== null) {
+    const old = document.getElementById(`ph${activePhraseIdx}`);
+    if (old) old.classList.remove('active');
+  }
+  activePhraseIdx = idx;
+  const el = document.getElementById(`ph${idx}`);
+  if (el) el.classList.add('active');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // show annotation form
+  document.getElementById('sidebarPrompt').style.display = 'none';
+  document.getElementById('annotationForm').style.display = 'block';
+  document.getElementById('annPhraseText').textContent = currentPhrases[idx];
+
+  // pre-fill from MY previous annotation
+  const myAnn = (allAnnotations[idx] || {})[MY_ID];
+  selectedAnnTags = new Set(myAnn ? myAnn.tags : []);
+  document.getElementById('annNote').value = myAnn ? (myAnn.note || '') : '';
+
+  renderAnnTags();
+  renderClassAnns(idx);
+}
+
+function renderAnnTags() {
+  const grid = document.getElementById('annTagsGrid');
+  grid.innerHTML = currentTags.map(tag => {
+    const sel = selectedAnnTags.has(tag.id);
+    return `<div class="ann-tag ${sel ? 'sel' : ''}" onclick="toggleAnnTag('${tag.id}')">
+      <span class="ann-dot" style="background:${tag.color}"></span>
+      ${escHtml(tag.label)}
+    </div>`;
+  }).join('');
+}
+
+function toggleAnnTag(id) {
+  if (selectedAnnTags.has(id)) { selectedAnnTags.delete(id); }
+  else { selectedAnnTags.add(id); }
+  renderAnnTags();
+}
+
+function renderClassAnns(idx) {
+  const container = document.getElementById('classAnns');
+  const anns = allAnnotations[idx] || {};
+  const entries = Object.entries(anns);
+  if (!entries.length) { container.innerHTML = ''; return; }
+
+  const tagMap = {};
+  currentTags.forEach(t => { tagMap[t.id] = t; });
+
+  const items = entries.map(([sid, a]) => {
+    const isMine = sid === MY_ID;
+    const tagPills = (a.tags || []).map(tid => {
+      const t = tagMap[tid];
+      const color = t ? t.color : '#888';
+      const label = t ? t.label : tid;
+      return `<span class="cai-tag" style="color:${color};border-color:${color}">${escHtml(label)}</span>`;
+    }).join('');
+    const note = a.note ? `<div class="cai-note">${escHtml(a.note)}</div>` : '';
+    return `<div class="class-ann-item">
+      <div class="cai-name">${escHtml(a.studentName || 'Anonymous')}${isMine ? ' (you)' : ''}</div>
+      <div class="cai-tags">${tagPills}</div>
+      ${note}
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `<div class="class-ann-heading">Class Annotations (${entries.length})</div>${items}`;
+}
+
+// ── Save annotation ───────────────────────────────────────────────────────────
+async function saveAnnotation() {
+  if (activePhraseIdx === null) return;
+  if (!selectedAnnTags.size) { alert('Select at least one tag.'); return; }
+
+  const annotation = {
+    tags: [...selectedAnnTags],
+    note: document.getElementById('annNote').value.trim(),
+    studentName: MY_NAME,
+    updatedAt: Date.now()
+  };
+
+  try {
+    await db.ref(`rooms/${ROOM_ID}/annotations/${activePhraseIdx}/${MY_ID}`).set(annotation);
+    setSyncStatus('ok');
+  } catch (e) {
+    setSyncStatus('err');
+    alert('Save failed: ' + e.message + '\n\nCheck Firebase database rules allow read/write.');
+  }
+}
+
+// ── Edit panel ────────────────────────────────────────────────────────────────
+function toggleEditPanel() {
+  document.getElementById('editPanel').classList.toggle('open');
+}
+
+function renderEpTagsGrid() {
+  const grid = document.getElementById('epTagsGrid');
+  grid.innerHTML = epAllTags().map(tag => {
+    const sel = epSelectedTags.has(tag.id);
+    return `<div class="tag-chip ${sel ? 'selected' : ''}" onclick="epToggleTag('${tag.id}')">
+      <span class="chip-dot" style="background:${tag.color}"></span>
+      ${escHtml(tag.label)}
+    </div>`;
+  }).join('');
+}
+
+function epToggleTag(id) {
+  if (epSelectedTags.has(id)) { if (epSelectedTags.size <= 1) return; epSelectedTags.delete(id); }
+  else { epSelectedTags.add(id); }
+  renderEpTagsGrid();
+}
+
+function addCustomTag() {
+  const input = document.getElementById('epCustomTag');
+  const label = input.value.trim();
+  if (!label || label.length > 30) return;
+  const id = 'c_' + Date.now();
+  const color = CUSTOM_COLORS[epCustomTags.length % CUSTOM_COLORS.length];
+  epCustomTags.push({ id, label, color });
+  epSelectedTags.add(id);
+  input.value = '';
+  renderEpTagsGrid();
+}
+
+document.getElementById('epCustomTag').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addCustomTag();
+});
+
+function renderEpPreview() {
+  const phrases = splitText(document.getElementById('epText').value);
+  const box = document.getElementById('epPreviewBox');
+  const count = document.getElementById('epPreviewCount');
+  if (!phrases.length) {
+    box.innerHTML = '<span style="color:var(--border);font-size:13px;">Paste text to preview.</span>';
+    count.textContent = '';
+    return;
+  }
+  box.innerHTML = phrases.map(p => `<span class="preview-phrase">${escHtml(p)} </span>`).join('');
+  count.textContent = `${phrases.length} phrase${phrases.length !== 1 ? 's' : ''}`;
+}
+
+async function publishReading() {
+  const title  = document.getElementById('epTitle').value.trim()  || 'Untitled Reading';
+  const source = document.getElementById('epSource').value.trim() || '';
+  const rawText = document.getElementById('epText').value.trim();
+  if (!rawText) { alert('Paste some text first.'); return; }
+
+  const phrases = splitText(rawText);
+  if (!phrases.length) { alert('Could not parse text.'); return; }
+
+  const activeTags = epAllTags().filter(t => epSelectedTags.has(t.id));
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true; btn.textContent = 'Publishing…';
+
+  try {
+    await db.ref(`rooms/${ROOM_ID}/content`).set({
+      title, source, rawText, phrases, tags: activeTags, publishedAt: Date.now()
+    });
+    document.getElementById('editPanel').classList.remove('open');
+    btn.textContent = 'Publish →';
+    btn.disabled = false;
+  } catch (e) {
+    alert('Publish failed: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Publish →';
+  }
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+async function exportData() {
+  const [contentSnap, annSnap] = await Promise.all([
+    db.ref(`rooms/${ROOM_ID}/content`).once('value'),
+    db.ref(`rooms/${ROOM_ID}/annotations`).once('value')
+  ]);
+  const data = { room: ROOM_ID, content: contentSnap.val(), annotations: annSnap.val() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: `closereader-${ROOM_ID}.json` });
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
-renderTagsGrid();
+(function init() {
+  const savedCode = localStorage.getItem('closereader_room');
+  const savedName = localStorage.getItem('closereader_name');
+  if (savedCode) document.getElementById('inCode').value = savedCode;
+  if (savedName) document.getElementById('inName').value = savedName;
+})();
 </script>
 </body>
 </html>
