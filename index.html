@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Close Reader — Create Session</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+
+  :root {
+    --blk: #1A1A1A;
+    --cream: #F5F0E8;
+    --ora: #FF4D00;
+    --mid: #8A8A8A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--blk);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 24px 48px;
+    border-bottom: 3px solid var(--ora);
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+  }
+
+  .header-brand {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 3px; color: var(--ora);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 36px; font-weight: 900;
+    color: var(--cream); line-height: 1;
+  }
+
+  .header-sub {
+    font-size: 12px; color: var(--mid);
+    margin-top: 5px; font-style: italic;
+  }
+
+  main {
+    max-width: 860px;
+    margin: 48px auto;
+    padding: 0 48px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  label, .field-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  input[type="text"], textarea {
+    background: #111;
+    border: 1px solid #2a2a2a;
+    color: var(--cream);
+    padding: 12px 16px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    width: 100%;
+    outline: none;
+    border-radius: 0;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus, textarea:focus { border-color: var(--ora); }
+
+  textarea {
+    min-height: 220px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* Tags */
+  .tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1px solid #2a2a2a;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: #111;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .tag-chip .chip-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%; flex-shrink: 0;
+  }
+
+  .tag-chip.selected { border-color: currentColor; }
+  .tag-chip:not(.selected) { opacity: 0.4; }
+
+  .custom-tag-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+  }
+
+  .custom-tag-row input {
+    max-width: 220px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .btn-sm {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid #333;
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-sm:hover { border-color: var(--cream); color: var(--cream); }
+
+  /* Preview */
+  .preview-box {
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    padding: 20px 24px;
+    max-height: 220px;
+    overflow-y: auto;
+    line-height: 2;
+  }
+
+  .preview-phrase {
+    display: inline;
+    padding: 1px 3px;
+    font-size: 14px;
+    border-radius: 1px;
+  }
+
+  .preview-phrase:nth-child(odd)  { background: rgba(255,255,255,0.03); }
+  .preview-phrase:nth-child(even) { background: rgba(255,255,255,0.06); }
+
+  .preview-count {
+    font-size: 11px; color: var(--mid);
+    margin-top: 8px;
+  }
+
+  hr { border: none; border-top: 1px solid #2a2a2a; }
+
+  /* Create button */
+  .btn-create {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 900;
+    letter-spacing: 3px; text-transform: uppercase;
+    padding: 16px 48px;
+    background: var(--ora);
+    border: none;
+    color: var(--blk);
+    cursor: pointer;
+    transition: opacity 0.15s;
+    align-self: flex-start;
+  }
+
+  .btn-create:hover { opacity: 0.85; }
+  .btn-create:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Success panel */
+  .session-created {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    padding: 32px;
+  }
+
+  .session-created.show { display: flex; }
+
+  .created-heading {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 900;
+    color: var(--cream);
+  }
+
+  .link-row { display: flex; flex-direction: column; gap: 6px; }
+
+  .link-label {
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .link-box { display: flex; gap: 8px; align-items: center; }
+
+  .link-url {
+    flex: 1;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    padding: 10px 14px;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--ora);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .btn-copy {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 10px 16px;
+    background: none;
+    border: 1px solid #333;
+    color: var(--mid);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .btn-copy:hover { border-color: var(--cream); color: var(--cream); }
+
+  .btn-open {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 12px 28px;
+    background: var(--ora);
+    border: none;
+    color: var(--blk);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 4px;
+    transition: opacity 0.15s;
+    align-self: flex-start;
+  }
+
+  .btn-open:hover { opacity: 0.85; }
+
+  .help-note {
+    font-size: 12px; color: var(--mid);
+    font-style: italic; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="header-brand">Close Reader</div>
+    <div class="header-title">Create a Reading Session</div>
+    <div class="header-sub">Upload any text. Students annotate in real time.</div>
+  </div>
+</header>
+
+<main>
+  <div class="two-col">
+    <div class="form-group">
+      <label for="titleInput">Reading Title</label>
+      <input type="text" id="titleInput" placeholder="e.g. The Metamorphosis — Opening" />
+    </div>
+    <div class="form-group">
+      <label for="sourceInput">Author / Source</label>
+      <input type="text" id="sourceInput" placeholder="e.g. Franz Kafka (1915)" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="textInput">Paste your text</label>
+    <textarea id="textInput" placeholder="Paste any paragraph, excerpt, or passage. It will be split into phrases that students can click and annotate."></textarea>
+  </div>
+
+  <div class="form-group">
+    <div class="field-label">Preview — how text will be split into phrases</div>
+    <div class="preview-box" id="previewBox">
+      <span style="color:#333;font-style:italic;font-size:12px;">Paste text above to see a preview.</span>
+    </div>
+    <div class="preview-count" id="previewCount"></div>
+  </div>
+
+  <div class="form-group">
+    <div class="field-label">Available tags — click to toggle</div>
+    <div class="tags-grid" id="tagsGrid"></div>
+    <div class="custom-tag-row">
+      <input type="text" id="customTagInput" placeholder="Add a custom tag..." />
+      <button class="btn-sm" onclick="addCustomTag()">+ Add Tag</button>
+    </div>
+  </div>
+
+  <hr />
+
+  <button class="btn-create" id="createBtn" onclick="createSession()">Create Session →</button>
+
+  <div class="session-created" id="sessionCreated">
+    <div class="created-heading">Session ready.</div>
+
+    <div class="link-row">
+      <div class="link-label">Student link — share this with your class</div>
+      <div class="link-box">
+        <div class="link-url" id="studentLink"></div>
+        <button class="btn-copy" onclick="copyLink('studentLink', this)">Copy</button>
+      </div>
+    </div>
+
+    <div class="link-row">
+      <div class="link-label">Teacher link — keep this private (grants full access)</div>
+      <div class="link-box">
+        <div class="link-url" id="teacherLink"></div>
+        <button class="btn-copy" onclick="copyLink('teacherLink', this)">Copy</button>
+      </div>
+    </div>
+
+    <a class="btn-open" id="openSession" target="_blank">Open Teacher View →</a>
+
+    <div class="help-note">
+      Students will be asked for their name when they first open the session.
+      All annotations are live — no refresh needed.
+    </div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCGzOSgk2wOHcZe9FU51ZbeJ6_Bq2SvyAE",
+  authDomain: "close-reading-c8f7a.firebaseapp.com",
+  databaseURL: "https://close-reading-c8f7a-default-rtdb.firebaseio.com",
+  projectId: "close-reading-c8f7a",
+  storageBucket: "close-reading-c8f7a.firebasestorage.app",
+  messagingSenderId: "785542219599",
+  appId: "1:785542219599:web:615b79b65ed3af1159a73a"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ── Default tags ──────────────────────────────────────────────────────────────
+const DEFAULT_TAGS = [
+  { id: 'confusing',   label: 'Confusing',   color: '#7ab0f5' },
+  { id: 'interesting', label: 'Interesting',  color: '#FF6B35' },
+  { id: 'important',   label: 'Important',    color: '#7fd080' },
+  { id: 'surprising',  label: 'Surprising',   color: '#c9a0f5' },
+  { id: 'question',    label: 'Question',     color: '#f5c842' },
+  { id: 'quotable',    label: 'Quotable',     color: '#f5a08a' },
+  { id: 'agree',       label: 'Agree',        color: '#5fd0c0' },
+  { id: 'disagree',    label: 'Disagree',     color: '#e07070' },
+];
+
+const CUSTOM_COLORS = ['#e0c97a', '#a0c8f5', '#f5a0d0', '#b0e0a0', '#f0d0a0', '#a0e0d0'];
+
+let selectedTags = new Set(DEFAULT_TAGS.map(t => t.id));
+let customTags = [];
+
+function getAllTags() {
+  return [...DEFAULT_TAGS, ...customTags];
+}
+
+function renderTagsGrid() {
+  const grid = document.getElementById('tagsGrid');
+  grid.innerHTML = getAllTags().map(tag => {
+    const sel = selectedTags.has(tag.id);
+    return `<div class="tag-chip ${sel ? 'selected' : ''}"
+      style="color:${tag.color}"
+      onclick="toggleTag('${tag.id}')">
+      <span class="chip-dot" style="background:${tag.color}"></span>
+      ${tag.label}
+    </div>`;
+  }).join('');
+}
+
+function toggleTag(id) {
+  if (selectedTags.has(id)) {
+    if (selectedTags.size <= 1) return;
+    selectedTags.delete(id);
+  } else {
+    selectedTags.add(id);
+  }
+  renderTagsGrid();
+}
+
+function addCustomTag() {
+  const input = document.getElementById('customTagInput');
+  const label = input.value.trim();
+  if (!label || label.length > 30) return;
+  const id = 'c_' + Date.now();
+  const color = CUSTOM_COLORS[customTags.length % CUSTOM_COLORS.length];
+  customTags.push({ id, label, color });
+  selectedTags.add(id);
+  input.value = '';
+  renderTagsGrid();
+}
+
+document.getElementById('customTagInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addCustomTag();
+});
+
+// ── Text splitting ────────────────────────────────────────────────────────────
+function splitText(raw) {
+  if (!raw.trim()) return [];
+
+  const paragraphs = raw.split(/\n\s*\n/).filter(p => p.trim());
+
+  // If multiple paragraphs, split by paragraph
+  if (paragraphs.length > 1) {
+    return paragraphs.map(p => p.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  }
+
+  // Single block: split by sentence
+  const text = raw.replace(/\s+/g, ' ').trim();
+  const results = [];
+  let i = 0;
+  let start = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+    if (/[.!?]/.test(ch)) {
+      // Consume trailing punctuation (e.g. "..." or "?!")
+      let end = i;
+      while (end + 1 < text.length && /[.!?]/.test(text[end + 1])) end++;
+      // Consume optional closing quote
+      if (end + 1 < text.length && /["'”’]/.test(text[end + 1])) end++;
+
+      const ahead = text.slice(end + 1);
+      // Sentence boundary: whitespace followed by uppercase or end of string
+      if (ahead === '' || /^\s+[A-Z“‘"']/.test(ahead)) {
+        const phrase = text.slice(start, end + 1).trim();
+        if (phrase) results.push(phrase);
+        // Skip whitespace
+        i = end + 1;
+        while (i < text.length && /\s/.test(text[i])) i++;
+        start = i;
+        continue;
+      }
+    }
+    i++;
+  }
+
+  if (start < text.length) {
+    const remaining = text.slice(start).trim();
+    if (remaining) results.push(remaining);
+  }
+
+  return results.length > 0 ? results : [text];
+}
+
+function renderPreview() {
+  const phrases = splitText(document.getElementById('textInput').value);
+  const box = document.getElementById('previewBox');
+  const count = document.getElementById('previewCount');
+  if (!phrases.length) {
+    box.innerHTML = '<span style="color:#333;font-style:italic;font-size:12px;">Paste text above to see a preview.</span>';
+    count.textContent = '';
+    return;
+  }
+  box.innerHTML = phrases.map(p =>
+    `<span class="preview-phrase">${p} </span>`
+  ).join('');
+  count.textContent = `${phrases.length} phrase${phrases.length !== 1 ? 's' : ''}`;
+}
+
+document.getElementById('textInput').addEventListener('input', renderPreview);
+
+// ── ID / token generators ─────────────────────────────────────────────────────
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+function genToken() {
+  return Array.from({ length: 28 }, () => Math.random().toString(36)[2] || 'a').join('');
+}
+
+// ── Create session ────────────────────────────────────────────────────────────
+async function createSession() {
+  const title  = document.getElementById('titleInput').value.trim()  || 'Untitled Reading';
+  const source = document.getElementById('sourceInput').value.trim() || '';
+  const text   = document.getElementById('textInput').value.trim();
+
+  if (!text) { alert('Paste some text first.'); return; }
+
+  const phrases = splitText(text);
+  if (!phrases.length) { alert('Could not parse text into phrases.'); return; }
+
+  const activeTags = getAllTags().filter(t => selectedTags.has(t.id));
+
+  const sessionId    = genCode();
+  const teacherToken = genToken();
+
+  const payload = {
+    meta: { title, source, createdAt: Date.now(), teacherToken, tags: activeTags },
+    phrases
+  };
+
+  const btn = document.getElementById('createBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+
+  try {
+    await db.ref(`sessions/${sessionId}`).set(payload);
+
+    const base = window.location.href.replace(/\/[^/]*$/, '');
+    const studentUrl = `${base}/session.html?s=${sessionId}`;
+    const teacherUrl = `${base}/session.html?s=${sessionId}&t=${teacherToken}`;
+
+    document.getElementById('studentLink').textContent = studentUrl;
+    document.getElementById('teacherLink').textContent = teacherUrl;
+    document.getElementById('openSession').href = teacherUrl;
+    document.getElementById('sessionCreated').classList.add('show');
+    document.getElementById('sessionCreated').scrollIntoView({ behavior: 'smooth' });
+    btn.textContent = 'Create Another Session →';
+    btn.disabled = false;
+  } catch (e) {
+    alert('Error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Create Session →';
+  }
+}
+
+function copyLink(id, btn) {
+  const url = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderTagsGrid();
+</script>
+</body>
+</html>
