@@ -5,259 +5,260 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Close Reader</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
   :root {
-    --blk: #1A1A1A;
-    --cream: #F5F0E8;
-    --ora: #FF4D00;
-    --mid: #8A8A8A;
+    --bg:     #FFFFFF;
+    --surface:#F3F3F0;
+    --ink:    #111111;
+    --mid:    #6B6B68;
+    --faint:  #E6E6E2;
+    --border: #CECECA;
+    --red:    #CC1100;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { border-top: 3px solid var(--red); }
+
   body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--blk);
-    color: var(--cream);
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Header ── */
+  /* ── Header ─────────────────────────────────────────────────────────────── */
   header {
-    padding: 20px 40px 16px;
-    border-bottom: 3px solid var(--ora);
+    padding: 20px 40px 18px;
+    border-bottom: 1px solid var(--border);
     display: flex;
-    align-items: flex-end;
-    gap: 24px;
+    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    gap: 24px;
     flex-shrink: 0;
+    flex-wrap: wrap;
   }
 
-  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .header-left { display: flex; flex-direction: column; gap: 3px; }
 
-  .header-brand {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 3px; color: var(--ora);
-    text-transform: uppercase;
+  .header-wordmark {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid);
   }
 
   .header-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 30px; font-weight: 900;
-    color: var(--cream); line-height: 1;
+    font-size: 26px; font-weight: 800;
+    color: var(--ink); line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
   .header-source {
-    font-size: 11px; color: var(--mid);
-    font-style: italic; margin-top: 3px;
+    font-size: 12px; color: var(--mid);
+    font-style: italic; margin-top: 1px;
   }
 
   .header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
     justify-content: flex-end;
+    flex-shrink: 0;
   }
 
   .session-code {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 3px; color: var(--mid);
-    text-transform: uppercase;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid);
     padding: 6px 12px;
-    border: 1px solid #2a2a2a;
+    border: 1px solid var(--border);
   }
 
   .role-badge {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
     padding: 6px 12px;
-    border: 1px solid var(--ora);
-    color: var(--ora);
+    border: 1px solid var(--red);
+    color: var(--red);
     display: none;
   }
 
   body.is-teacher .role-badge { display: block; }
 
-  .sync-status {
+  .sync-pill {
     display: flex; align-items: center; gap: 6px;
-    font-size: 10px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--mid);
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--mid);
     padding: 6px 12px;
-    border: 1px solid #2a2a2a;
+    border: 1px solid var(--border);
   }
 
   .sync-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #333; transition: background 0.3s; flex-shrink: 0;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border); transition: background 0.3s; flex-shrink: 0;
   }
 
-  .sync-dot.connected { background: #7fd080; }
-  .sync-dot.syncing   { background: var(--ora); animation: pulse 0.6s infinite alternate; }
-  .sync-dot.error     { background: #e05050; }
+  .sync-dot.connected { background: #16A34A; }
+  .sync-dot.syncing   { background: var(--red); animation: pulse 0.7s infinite alternate; }
+  .sync-dot.error     { background: #DC2626; }
 
-  @keyframes pulse { from { opacity: 1; } to { opacity: 0.3; } }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.2; } }
 
-  /* ── Main layout ── */
+  /* ── Main layout ─────────────────────────────────────────────────────────── */
   main {
     flex: 1;
     display: flex;
     min-height: 0;
   }
 
+  /* ── Text panel ──────────────────────────────────────────────────────────── */
   .text-panel {
     flex: 1;
-    padding: 48px 56px;
+    padding: 52px 64px;
     overflow-y: auto;
-    border-right: 1px solid #2a2a2a;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
   }
 
   .text-instruction {
     font-size: 10px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: var(--mid); margin-bottom: 28px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--border);
   }
 
   #textDisplay {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 26px; font-weight: 700;
-    color: var(--cream); line-height: 1.9;
-    letter-spacing: 0.2px;
+    font-size: 21px; font-weight: 400;
+    color: var(--ink); line-height: 1.9;
+    letter-spacing: -0.005em;
+    max-width: 640px;
   }
 
-  /* ── Phrases ── */
+  /* ── Phrases ─────────────────────────────────────────────────────────────── */
   .phrase {
     display: inline;
-    padding: 2px 4px;
-    border-radius: 2px;
+    padding: 1px 2px;
     cursor: pointer;
-    position: relative;
-    transition: background 0.12s;
+    border-bottom: 1px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
   }
 
-  .phrase:hover { background: rgba(255,255,255,0.06); }
+  .phrase:hover { background: var(--surface); border-bottom-color: var(--border); }
 
-  /* tag indicators shown as dots below each annotated phrase */
+  .phrase.own-annotation {
+    border-bottom: 2px solid var(--ink);
+    background: var(--surface);
+  }
+
   .phrase-dots {
     display: inline-flex;
     align-items: center;
     gap: 3px;
     vertical-align: middle;
-    margin-left: 4px;
+    margin-left: 5px;
+    margin-right: 1px;
   }
 
   .phrase-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    opacity: 0.85;
+    width: 6px; height: 6px;
+    border-radius: 50%; flex-shrink: 0;
   }
 
-  .phrase-dot-count {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    line-height: 1; color: inherit;
-    opacity: 0.7;
-  }
-
-  /* Own annotation highlight */
-  .phrase.own-annotation {
-    background: rgba(255,255,255,0.08);
-    border-bottom: 2px solid var(--mid);
-  }
-
-  /* ── Annotation popover ── */
+  /* ── Annotation popover ──────────────────────────────────────────────────── */
   .popover {
     position: fixed;
-    background: #141414;
-    border: 1px solid #333;
+    background: var(--bg);
+    border: 1px solid var(--border);
     z-index: 300;
     display: none;
     flex-direction: column;
-    width: 320px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+    width: 300px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
   }
 
   .popover.show { display: flex; }
 
   .pop-phrase-text {
     padding: 14px 16px 12px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px; font-weight: 700;
-    color: var(--cream); line-height: 1.4;
-    border-bottom: 1px solid #222;
+    font-size: 14px; font-weight: 500;
+    color: var(--ink); line-height: 1.5;
+    border-bottom: 1px solid var(--faint);
     max-height: 80px;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    font-style: italic;
   }
 
   .pop-section {
     padding: 12px 16px;
-    border-bottom: 1px solid #1e1e1e;
+    border-bottom: 1px solid var(--faint);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 9px;
   }
 
   .pop-label {
     font-size: 9px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+    letter-spacing: 0.15em; text-transform: uppercase;
     color: var(--mid);
   }
 
   .pop-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
   }
 
   .pop-tag {
     display: flex; align-items: center; gap: 5px;
-    padding: 5px 10px;
-    border: 1px solid #2a2a2a;
-    background: #0d0d0d;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
     cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    transition: all 0.12s;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink);
+    transition: all 0.1s;
     user-select: none;
   }
 
-  .pop-tag .tag-dot {
-    width: 7px; height: 7px;
+  .tag-dot {
+    width: 6px; height: 6px;
     border-radius: 50%; flex-shrink: 0;
   }
 
-  .pop-tag.selected { border-color: currentColor; background: rgba(255,255,255,0.05); }
-  .pop-tag:not(.selected) { opacity: 0.5; }
+  .pop-tag.selected { background: var(--surface); border-color: var(--ink); }
+  .pop-tag:not(.selected) { opacity: 0.4; }
   .pop-tag:hover { opacity: 1; }
 
   .pop-note {
     width: 100%;
-    background: #0d0d0d;
-    border: 1px solid #2a2a2a;
-    color: var(--cream);
+    background: var(--surface);
+    border: 1px solid var(--faint);
+    color: var(--ink);
     padding: 9px 12px;
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     resize: none;
     outline: none;
     min-height: 72px;
-    transition: border-color 0.15s;
+    transition: border-color 0.12s;
     border-radius: 0;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .pop-note:focus { border-color: #555; }
+  .pop-note:focus { border-color: var(--border); }
+  .pop-note::placeholder { color: var(--border); }
 
   .pop-actions {
     display: flex;
@@ -267,48 +268,48 @@
 
   .pop-save {
     flex: 1;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
     padding: 9px 16px;
-    background: var(--ora);
+    background: var(--ink);
     border: none;
-    color: var(--blk);
+    color: #FFFFFF;
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: opacity 0.12s;
   }
 
-  .pop-save:hover { opacity: 0.85; }
+  .pop-save:hover { opacity: 0.7; }
 
   .pop-remove {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 9px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 9px 12px;
     background: none;
-    border: 1px solid #2a2a2a;
-    color: #555;
+    border: 1px solid var(--faint);
+    color: var(--mid);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
     display: none;
   }
 
   .pop-remove.visible { display: block; }
-  .pop-remove:hover { border-color: #e07070; color: #e07070; }
+  .pop-remove:hover { border-color: #DC2626; color: #DC2626; }
 
   /* Teacher: student annotations in popover */
   .pop-annotations {
-    max-height: 240px;
+    max-height: 260px;
     overflow-y: auto;
-    border-top: 1px solid #1e1e1e;
+    border-top: 1px solid var(--faint);
   }
 
-  .pop-annotation-item {
+  .pop-ann-item {
     padding: 10px 16px;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid var(--faint);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
   }
 
   .pop-ann-header {
@@ -318,250 +319,246 @@
   }
 
   .pop-ann-name {
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--mid); flex: 1;
   }
 
-  .pop-ann-tags {
-    display: flex; gap: 4px; flex-wrap: wrap;
-  }
+  .pop-ann-tags { display: flex; gap: 4px; flex-wrap: wrap; }
 
   .pop-ann-tag {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
     padding: 2px 6px;
     border: 1px solid currentColor;
-    border-radius: 1px;
   }
 
   .pop-ann-note {
-    font-size: 12px; color: #aaa;
+    font-size: 12px; color: var(--mid);
     font-style: italic; line-height: 1.5;
-    padding-left: 2px;
   }
 
   .pop-ann-delete {
     background: none; border: none;
-    color: #444; cursor: pointer;
-    font-size: 14px; line-height: 1;
+    color: var(--border); cursor: pointer;
+    font-size: 16px; line-height: 1;
     padding: 0 2px;
     transition: color 0.12s;
     flex-shrink: 0;
   }
 
-  .pop-ann-delete:hover { color: #e07070; }
+  .pop-ann-delete:hover { color: #DC2626; }
 
   .pop-no-ann {
-    padding: 12px 16px;
-    font-size: 12px; color: #333;
+    padding: 14px 16px;
+    font-size: 12px; color: var(--border);
     font-style: italic;
   }
 
-  /* ── Sidebar ── */
+  /* ── Sidebar ─────────────────────────────────────────────────────────────── */
   .sidebar {
-    width: 300px;
+    width: 280px;
     flex-shrink: 0;
-    padding: 28px 24px;
+    background: var(--surface);
+    padding: 32px 24px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
     overflow-y: auto;
   }
 
-  .sidebar-title {
+  .sidebar-section {
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--faint);
+  }
+
+  .sidebar-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .sidebar-label {
     font-size: 9px; font-weight: 700;
-    letter-spacing: 3px; color: var(--mid);
-    text-transform: uppercase;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #2a2a2a;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 20px;
   }
 
-  /* Tag summary */
-  .tag-summary { display: flex; flex-direction: column; gap: 8px; }
-
-  .tag-row {
-    display: flex; align-items: center; gap: 8px;
+  /* Tag count rows — Swiss poster style: big number, small label */
+  .tag-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 4px 0;
   }
 
-  .tag-row-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%; flex-shrink: 0;
+  .tag-stat-count {
+    font-size: 28px; font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    min-width: 44px;
+    font-variant-numeric: tabular-nums;
   }
 
-  .tag-row-label {
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    flex: 1;
+  .tag-stat-label {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
   }
 
-  .tag-row-count {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px; font-weight: 900; line-height: 1;
-  }
-
-  /* Annotations list in sidebar */
-  .ann-list { display: flex; flex-direction: column; gap: 6px; }
+  /* Annotation feed */
+  .ann-feed { display: flex; flex-direction: column; gap: 8px; }
 
   .ann-card {
-    background: #111;
+    background: var(--bg);
     padding: 10px 12px;
     display: flex; flex-direction: column; gap: 5px;
     border-left: 2px solid transparent;
-    animation: fadeIn 0.2s ease;
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateX(-4px); }
-    to   { opacity: 1; transform: translateX(0); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  .ann-card-phrase {
+  .ann-card { animation: fadeUp 0.2s ease; }
+
+  .ann-card-quote {
     font-size: 11px; font-style: italic;
-    color: #aaa; line-height: 1.4;
+    color: var(--mid); line-height: 1.5;
   }
 
   .ann-card-meta {
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    display: flex; align-items: center;
+    gap: 6px; flex-wrap: wrap;
   }
 
   .ann-card-name {
     font-size: 9px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
+    letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--mid);
   }
 
   .ann-card-tag {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
-    padding: 1px 6px;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 1px 5px;
     border: 1px solid currentColor;
   }
 
   .ann-card-note {
-    font-size: 11px; color: #888;
+    font-size: 11px; color: var(--mid);
     font-style: italic; line-height: 1.5;
   }
 
   .ann-empty {
-    font-size: 12px; color: #333;
-    font-style: italic; padding: 4px 0;
+    font-size: 12px; color: var(--border);
+    font-style: italic;
   }
 
-  /* Teacher controls in sidebar */
+  /* Teacher controls */
   .teacher-controls {
     display: none;
     flex-direction: column;
-    gap: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #1a1a1a;
+    gap: 6px;
   }
 
   body.is-teacher .teacher-controls { display: flex; }
 
-  .btn-danger {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 9px 16px;
+  .btn-ctrl {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 9px 14px;
     background: none;
-    border: 1px solid #333;
-    color: #555;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-  }
-
-  .btn-danger:hover { border-color: #e07070; color: #e07070; }
-
-  .btn-export {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 9px 16px;
-    background: none;
-    border: 1px solid #333;
+    border: 1px solid var(--border);
     color: var(--mid);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
     text-align: left;
   }
 
-  .btn-export:hover { border-color: var(--cream); color: var(--cream); }
+  .btn-ctrl:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-ctrl.danger:hover { border-color: #DC2626; color: #DC2626; }
 
-  /* ── Name dialog ── */
+  /* ── Name dialog ─────────────────────────────────────────────────────────── */
   .dialog-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(255,255,255,0.92);
     display: flex; align-items: center; justify-content: center;
     z-index: 500;
   }
 
   .dialog-box {
-    background: #141414;
-    border: 1px solid #333;
-    padding: 40px;
-    width: 360px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 48px;
+    width: 380px;
     display: flex; flex-direction: column; gap: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  }
+
+  .dialog-eyebrow {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid);
   }
 
   .dialog-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 24px; font-weight: 900;
-    color: var(--cream);
+    font-size: 28px; font-weight: 800;
+    color: var(--ink); letter-spacing: -0.02em;
+    line-height: 1.1; margin-top: -4px;
   }
 
   .dialog-sub {
-    font-size: 13px; color: var(--mid); line-height: 1.5;
-    margin-top: -10px;
+    font-size: 13px; color: var(--mid);
+    line-height: 1.6; margin-top: -4px;
   }
 
   .dialog-input {
-    background: #0d0d0d;
-    border: 1px solid #333;
-    color: var(--cream);
-    padding: 12px 16px;
-    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     outline: none;
     width: 100%;
     border-radius: 0;
-    transition: border-color 0.15s;
+    transition: border-color 0.12s;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .dialog-input:focus { border-color: var(--ora); }
+  .dialog-input:focus { border-color: var(--red); }
 
   .dialog-btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px; font-weight: 900;
-    letter-spacing: 3px; text-transform: uppercase;
-    padding: 13px 24px;
-    background: var(--ora);
-    border: none; color: var(--blk);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 13px 28px;
+    background: var(--ink);
+    border: none; color: #FFFFFF;
     cursor: pointer; transition: opacity 0.15s;
     align-self: flex-start;
   }
 
-  .dialog-btn:hover { opacity: 0.85; }
+  .dialog-btn:hover { opacity: 0.7; }
 
-  /* ── Loading / Error ── */
+  /* ── Loading / error ─────────────────────────────────────────────────────── */
   .loading-screen {
     flex: 1; display: flex;
     align-items: center; justify-content: center;
-    flex-direction: column; gap: 16px;
+    flex-direction: column; gap: 12px;
   }
 
   .loading-text {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 22px; font-weight: 700;
-    color: var(--mid); letter-spacing: 3px;
-    text-transform: uppercase;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--border);
   }
 
   .error-text {
-    font-size: 14px; color: #e07070;
+    font-size: 13px; color: #DC2626;
     font-style: italic;
   }
 </style>
@@ -570,48 +567,48 @@
 
 <header>
   <div class="header-left">
-    <div class="header-brand">Close Reader</div>
-    <div class="header-title" id="headerTitle">Loading...</div>
+    <div class="header-wordmark">Close Reader</div>
+    <div class="header-title" id="headerTitle">Loading…</div>
     <div class="header-source" id="headerSource"></div>
   </div>
   <div class="header-right">
     <div class="session-code" id="sessionCodeDisplay"></div>
     <div class="role-badge">Teacher</div>
-    <div class="sync-status">
+    <div class="sync-pill">
       <div class="sync-dot" id="syncDot"></div>
-      <span id="syncLabel">Connecting...</span>
+      <span id="syncLabel">Connecting</span>
     </div>
   </div>
 </header>
 
-<!-- Loading placeholder -->
 <div class="loading-screen" id="loadingScreen">
-  <div class="loading-text">Loading session...</div>
+  <div class="loading-text">Loading session…</div>
   <div class="error-text" id="errorText" style="display:none"></div>
 </div>
 
-<!-- Main content (hidden until loaded) -->
 <main id="mainContent" style="display:none">
   <div class="text-panel">
-    <div class="text-instruction" id="textInstruction">Click any phrase to add your annotation</div>
+    <div class="text-instruction" id="textInstruction">Click any phrase to annotate</div>
     <div id="textDisplay"></div>
   </div>
 
   <div class="sidebar">
-    <div class="sidebar-title">Annotations</div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tags</div>
+      <div id="tagSummary"></div>
+    </div>
 
-    <div class="tag-summary" id="tagSummary"></div>
-
-    <div style="border-top:1px solid #222;padding-top:16px;">
-      <div class="sidebar-title" id="annListTitle">All Annotations</div>
-      <div class="ann-list" id="annList" style="margin-top:12px;">
-        <div class="ann-empty">No annotations yet.</div>
+    <div class="sidebar-section">
+      <div class="sidebar-label" id="annListTitle">Annotations</div>
+      <div class="ann-feed" id="annList">
+        <div class="ann-empty">None yet.</div>
       </div>
     </div>
 
-    <div class="teacher-controls">
-      <button class="btn-export" onclick="exportData()">Export as JSON</button>
-      <button class="btn-danger" onclick="resetAll()">Clear All Annotations</button>
+    <div class="sidebar-section teacher-controls">
+      <div class="sidebar-label">Controls</div>
+      <button class="btn-ctrl" onclick="exportData()">Export as JSON</button>
+      <button class="btn-ctrl danger" onclick="resetAll()">Clear All Annotations</button>
     </div>
   </div>
 </main>
@@ -621,31 +618,31 @@
   <div class="pop-phrase-text" id="popPhraseText"></div>
 
   <div class="pop-section" id="popTagSection">
-    <div class="pop-label">Tag this phrase</div>
+    <div class="pop-label">Tag</div>
     <div class="pop-tags" id="popTags"></div>
   </div>
 
-  <div class="pop-section">
-    <div class="pop-label">Note <span style="font-weight:400;letter-spacing:0;text-transform:none;font-style:italic;color:#555"> — optional</span></div>
-    <textarea class="pop-note" id="popNote" placeholder="What did you notice? What question does this raise?"></textarea>
+  <div class="pop-section" id="popNoteSection">
+    <div class="pop-label">Note <span style="font-weight:400;letter-spacing:0;text-transform:none;font-style:italic;color:var(--border)"> — optional</span></div>
+    <textarea class="pop-note" id="popNote" placeholder="What did you notice?"></textarea>
   </div>
 
-  <div class="pop-actions">
+  <div class="pop-actions" id="popActions">
     <button class="pop-save" onclick="saveAnnotation()">Save</button>
-    <button class="pop-remove" id="popRemove" onclick="removeMyAnnotation()">Remove mine</button>
+    <button class="pop-remove" id="popRemove" onclick="removeMyAnnotation()">Remove</button>
   </div>
 
-  <!-- Teacher: all student annotations -->
   <div class="pop-annotations" id="popAnnotations" style="display:none"></div>
 </div>
 
 <!-- Name dialog -->
 <div class="dialog-overlay" id="nameDialog" style="display:none">
   <div class="dialog-box">
+    <div class="dialog-eyebrow">Close Reader</div>
     <div class="dialog-title">What's your name?</div>
-    <div class="dialog-sub">Your name will appear next to your annotations so your teacher can see your thinking.</div>
+    <div class="dialog-sub">Your name appears next to your annotations so your teacher can follow your thinking.</div>
     <input class="dialog-input" id="nameInput" type="text" placeholder="First name or nickname" maxlength="40" />
-    <button class="dialog-btn" onclick="submitName()">Join Session →</button>
+    <button class="dialog-btn" onclick="submitName()">Join →</button>
   </div>
 </div>
 
@@ -665,20 +662,17 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ── URL params ────────────────────────────────────────────────────────────────
-const params      = new URLSearchParams(location.search);
-const SESSION_ID  = (params.get('s') || '').toUpperCase();
-const URL_TOKEN   = params.get('t') || '';
+const params     = new URLSearchParams(location.search);
+const SESSION_ID = (params.get('s') || '').toUpperCase();
+const URL_TOKEN  = params.get('t') || '';
 
-// ── Session state ─────────────────────────────────────────────────────────────
-let sessionMeta   = null;   // { title, source, tags, teacherToken }
+let sessionMeta   = null;
 let phrases       = [];
 let isTeacher     = false;
-let annotations   = {};     // { [phraseIdx]: { [studentId]: {tags:[], note, studentName, createdAt} } }
+let annotations   = {};
 let activePhraseIdx = null;
 let selectedPopTags = new Set();
 
-// ── Student identity ──────────────────────────────────────────────────────────
 function getStudentId() {
   let id = localStorage.getItem('cr_student_id');
   if (!id) {
@@ -688,22 +682,16 @@ function getStudentId() {
   return id;
 }
 
-function getStudentName() {
-  return localStorage.getItem('cr_student_name') || null;
-}
-
-function setStudentName(name) {
-  localStorage.setItem('cr_student_name', name.trim());
-}
+function getStudentName() { return localStorage.getItem('cr_student_name') || null; }
+function setStudentName(name) { localStorage.setItem('cr_student_name', name.trim()); }
 
 const MY_ID = getStudentId();
 
-// ── Sync indicator ────────────────────────────────────────────────────────────
 function setSyncStatus(state) {
   const dot = document.getElementById('syncDot');
   const lbl = document.getElementById('syncLabel');
   dot.className = 'sync-dot ' + state;
-  lbl.textContent = { connected: 'Live', syncing: 'Syncing...', error: 'Offline' }[state] || 'Connecting...';
+  lbl.textContent = { connected: 'Live', syncing: 'Syncing', error: 'Offline' }[state] || 'Connecting';
 }
 
 db.ref('.info/connected').on('value', snap => {
@@ -712,9 +700,9 @@ db.ref('.info/connected').on('value', snap => {
 
 // ── Load session ──────────────────────────────────────────────────────────────
 async function loadSession() {
-  if (!SESSION_ID) { showError('No session ID in URL. Check your link.'); return; }
+  if (!SESSION_ID) { showError('No session ID in URL.'); return; }
 
-  document.getElementById('sessionCodeDisplay').textContent = 'Session ' + SESSION_ID;
+  document.getElementById('sessionCodeDisplay').textContent = SESSION_ID;
 
   let snap;
   try {
@@ -726,31 +714,26 @@ async function loadSession() {
 
   if (!snap.exists()) { showError(`Session "${SESSION_ID}" not found.`); return; }
 
-  const data = snap.val();
+  const data  = snap.val();
   sessionMeta = data.meta;
   phrases     = data.phrases || [];
+  isTeacher   = URL_TOKEN && URL_TOKEN === sessionMeta.teacherToken;
 
-  isTeacher = URL_TOKEN && URL_TOKEN === sessionMeta.teacherToken;
-
-  document.getElementById('headerTitle').textContent = sessionMeta.title || 'Untitled';
+  document.getElementById('headerTitle').textContent  = sessionMeta.title  || 'Untitled';
   document.getElementById('headerSource').textContent = sessionMeta.source || '';
   document.title = sessionMeta.title + ' — Close Reader';
 
   if (isTeacher) {
     document.body.classList.add('is-teacher');
-    document.getElementById('textInstruction').textContent = 'Click any phrase to see all student annotations';
-    document.getElementById('annListTitle').textContent = 'All Annotations';
-  } else {
-    document.getElementById('annListTitle').textContent = 'All Annotations';
+    document.getElementById('textInstruction').textContent = 'Click any phrase to see student annotations';
   }
 
   buildTextDOM();
   buildTagSummary();
 
   document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'flex';
+  document.getElementById('mainContent').style.display  = 'flex';
 
-  // Subscribe to annotations
   db.ref(`sessions/${SESSION_ID}/annotations`).on('value', snap => {
     annotations = snap.val() || {};
     renderPhraseIndicators();
@@ -758,10 +741,9 @@ async function loadSession() {
     setSyncStatus('connected');
   });
 
-  // Name prompt (not teacher)
   if (!isTeacher && !getStudentName()) {
     document.getElementById('nameDialog').style.display = 'flex';
-    document.getElementById('nameInput').focus();
+    setTimeout(() => document.getElementById('nameInput').focus(), 50);
   }
 }
 
@@ -772,27 +754,25 @@ function showError(msg) {
   err.style.display = 'block';
 }
 
-// ── Build text DOM ────────────────────────────────────────────────────────────
-function buildTextDOM() {
-  const display = document.getElementById('textDisplay');
-  display.innerHTML = phrases.map((p, i) =>
-    `<span class="phrase" id="ph${i}" onclick="openPopover(event, ${i})">${escHtml(p)}<span class="phrase-dots" id="pd${i}"></span></span> `
-  ).join('');
-}
-
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ── Tag summary in sidebar ────────────────────────────────────────────────────
+// ── Build text DOM ────────────────────────────────────────────────────────────
+function buildTextDOM() {
+  document.getElementById('textDisplay').innerHTML = phrases.map((p, i) =>
+    `<span class="phrase" id="ph${i}" onclick="openPopover(event,${i})">${escHtml(p)}<span class="phrase-dots" id="pd${i}"></span></span> `
+  ).join('');
+}
+
+// ── Tag summary — big numbers ─────────────────────────────────────────────────
 function buildTagSummary() {
   const container = document.getElementById('tagSummary');
   if (!sessionMeta || !sessionMeta.tags) return;
   container.innerHTML = sessionMeta.tags.map(tag =>
-    `<div class="tag-row" id="tr_${tag.id}">
-      <div class="tag-row-dot" style="background:${tag.color}"></div>
-      <div class="tag-row-label" style="color:${tag.color}">${tag.label}</div>
-      <div class="tag-row-count" style="color:${tag.color}" id="tc_${tag.id}">0</div>
+    `<div class="tag-stat">
+      <div class="tag-stat-count" style="color:${tag.color}" id="tc_${tag.id}">0</div>
+      <div class="tag-stat-label" style="color:${tag.color}">${tag.label}</div>
     </div>`
   ).join('');
 }
@@ -801,95 +781,78 @@ function updateTagCounts() {
   if (!sessionMeta || !sessionMeta.tags) return;
   const counts = {};
   sessionMeta.tags.forEach(t => { counts[t.id] = 0; });
-
   Object.values(annotations).forEach(phraseAnns => {
     Object.values(phraseAnns).forEach(ann => {
-      (ann.tags || []).forEach(tid => {
-        if (counts[tid] !== undefined) counts[tid]++;
-      });
+      (ann.tags || []).forEach(tid => { if (counts[tid] !== undefined) counts[tid]++; });
     });
   });
-
   sessionMeta.tags.forEach(tag => {
     const el = document.getElementById('tc_' + tag.id);
     if (el) el.textContent = counts[tag.id] || 0;
   });
 }
 
-// ── Render phrase indicators (dots) ──────────────────────────────────────────
+// ── Phrase dot indicators ─────────────────────────────────────────────────────
 function renderPhraseIndicators() {
+  const tagMap = {};
+  (sessionMeta.tags || []).forEach(t => { tagMap[t.id] = t; });
+
   phrases.forEach((_, i) => {
-    const dotContainer = document.getElementById('pd' + i);
-    const phraseEl     = document.getElementById('ph' + i);
-    if (!dotContainer || !phraseEl) return;
+    const dots    = document.getElementById('pd' + i);
+    const phraseEl= document.getElementById('ph' + i);
+    if (!dots || !phraseEl) return;
 
     const phraseAnns = annotations[i] || {};
     const tagCounts  = {};
-
     Object.values(phraseAnns).forEach(ann => {
-      (ann.tags || []).forEach(tid => {
-        tagCounts[tid] = (tagCounts[tid] || 0) + 1;
-      });
+      (ann.tags || []).forEach(tid => { tagCounts[tid] = (tagCounts[tid] || 0) + 1; });
     });
 
-    const hasOwn = !!phraseAnns[MY_ID];
-    phraseEl.classList.toggle('own-annotation', hasOwn);
+    phraseEl.classList.toggle('own-annotation', !!phraseAnns[MY_ID]);
 
-    if (Object.keys(tagCounts).length === 0) {
-      dotContainer.innerHTML = '';
-      return;
-    }
+    if (!Object.keys(tagCounts).length) { dots.innerHTML = ''; return; }
 
-    const tagMap = {};
-    (sessionMeta.tags || []).forEach(t => { tagMap[t.id] = t; });
-
-    dotContainer.innerHTML = Object.entries(tagCounts).map(([tid, cnt]) => {
+    dots.innerHTML = Object.entries(tagCounts).map(([tid]) => {
       const tag = tagMap[tid];
-      if (!tag) return '';
-      return `<span class="phrase-dot" style="background:${tag.color}" title="${tag.label}: ${cnt}"></span>`;
+      return tag ? `<span class="phrase-dot" style="background:${tag.color}" title="${tag.label}"></span>` : '';
     }).join('');
   });
 
   updateTagCounts();
 }
 
-// ── Render sidebar annotation list ────────────────────────────────────────────
+// ── Sidebar annotation list ───────────────────────────────────────────────────
 function renderSidebarAnnotations() {
-  const list = document.getElementById('annList');
+  const list   = document.getElementById('annList');
   const tagMap = {};
   (sessionMeta.tags || []).forEach(t => { tagMap[t.id] = t; });
 
   const allAnns = [];
-
-  Object.entries(annotations).forEach(([phraseIdx, phraseAnns]) => {
-    Object.entries(phraseAnns).forEach(([studentId, ann]) => {
-      allAnns.push({ phraseIdx: parseInt(phraseIdx), studentId, ...ann });
+  Object.entries(annotations).forEach(([pIdx, phraseAnns]) => {
+    Object.entries(phraseAnns).forEach(([sid, ann]) => {
+      allAnns.push({ phraseIdx: parseInt(pIdx), studentId: sid, ...ann });
     });
   });
-
-  // Sort newest first
   allAnns.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
   if (!allAnns.length) {
-    list.innerHTML = '<div class="ann-empty">No annotations yet.</div>';
+    list.innerHTML = '<div class="ann-empty">None yet.</div>';
     return;
   }
 
   list.innerHTML = allAnns.map(ann => {
-    const phraseText = phrases[ann.phraseIdx] || '';
-    const tagChips = (ann.tags || []).map(tid => {
+    const text = phrases[ann.phraseIdx] || '';
+    const tags = (ann.tags || []).map(tid => {
       const tag = tagMap[tid];
-      if (!tag) return '';
-      return `<span class="ann-card-tag" style="color:${tag.color}">${tag.label}</span>`;
+      return tag ? `<span class="ann-card-tag" style="color:${tag.color}">${tag.label}</span>` : '';
     }).join('');
     const borderColor = ann.tags && ann.tags[0] && tagMap[ann.tags[0]]
-      ? tagMap[ann.tags[0]].color : '#444';
-
+      ? tagMap[ann.tags[0]].color : 'transparent';
     return `<div class="ann-card" style="border-left-color:${borderColor}">
-      <div class="ann-card-phrase">"${escHtml(phraseText.slice(0, 80))}${phraseText.length > 80 ? '…' : ''}"</div>
+      <div class="ann-card-quote">"${escHtml(text.slice(0,70))}${text.length>70?'…':''}"</div>
       <div class="ann-card-meta">
-        <span class="ann-card-name">${escHtml(ann.studentName || 'Anonymous')}</span>
-        ${tagChips}
+        <span class="ann-card-name">${escHtml(ann.studentName||'Anonymous')}</span>
+        ${tags}
       </div>
       ${ann.note ? `<div class="ann-card-note">${escHtml(ann.note)}</div>` : ''}
     </div>`;
@@ -902,9 +865,6 @@ function openPopover(e, idx) {
   activePhraseIdx = idx;
   selectedPopTags = new Set();
 
-  const pop = document.getElementById('popover');
-
-  // Load own existing annotation
   const myAnn = (annotations[idx] || {})[MY_ID];
   if (myAnn) {
     selectedPopTags = new Set(myAnn.tags || []);
@@ -916,50 +876,38 @@ function openPopover(e, idx) {
   document.getElementById('popPhraseText').textContent = phrases[idx] || '';
   document.getElementById('popRemove').classList.toggle('visible', !!myAnn);
 
-  // Render tags
   renderPopTags();
 
-  // Teacher: show all student annotations
   const annSection = document.getElementById('popAnnotations');
   if (isTeacher) {
     annSection.style.display = 'block';
     renderPopAnnotations(idx);
+    document.getElementById('popTagSection').style.display  = 'none';
+    document.getElementById('popNoteSection').style.display = 'none';
+    document.getElementById('popActions').style.display     = 'none';
   } else {
     annSection.style.display = 'none';
+    document.getElementById('popTagSection').style.display  = 'flex';
+    document.getElementById('popNoteSection').style.display = 'flex';
+    document.getElementById('popActions').style.display     = 'flex';
   }
 
-  // For teacher in read mode, hide the tag/note input section
-  const tagSection = document.getElementById('popTagSection');
-  if (isTeacher) {
-    tagSection.style.display = 'none';
-    document.querySelector('.pop-section:last-of-type').style.display = 'none';
-    document.querySelector('.pop-actions').style.display = 'none';
-  } else {
-    tagSection.style.display = 'flex';
-    document.querySelector('.pop-section:last-of-type').style.display = 'flex';
-    document.querySelector('.pop-actions').style.display = 'flex';
-  }
-
-  // Position popover
+  const pop  = document.getElementById('popover');
   const rect = document.getElementById('ph' + idx).getBoundingClientRect();
-  const popW = 320;
+  const popW = 300;
   let left = e.clientX;
   let top  = rect.bottom + 8;
-
   if (left + popW > window.innerWidth - 16) left = window.innerWidth - popW - 16;
-  if (top + 400 > window.innerHeight) top = rect.top - Math.min(400, rect.top - 16);
-
+  if (top + 420 > window.innerHeight) top = Math.max(8, rect.top - 420);
   pop.style.left = left + 'px';
-  pop.style.top  = top + 'px';
+  pop.style.top  = top  + 'px';
   pop.classList.add('show');
 }
 
 function renderPopTags() {
-  const container = document.getElementById('popTags');
   const tags = (sessionMeta && sessionMeta.tags) || [];
-  container.innerHTML = tags.map(tag =>
+  document.getElementById('popTags').innerHTML = tags.map(tag =>
     `<div class="pop-tag ${selectedPopTags.has(tag.id) ? 'selected' : ''}"
-       style="color:${tag.color}"
        onclick="togglePopTag('${tag.id}')">
       <span class="tag-dot" style="background:${tag.color}"></span>
       ${tag.label}
@@ -968,38 +916,32 @@ function renderPopTags() {
 }
 
 function togglePopTag(id) {
-  if (selectedPopTags.has(id)) {
-    selectedPopTags.delete(id);
-  } else {
-    selectedPopTags.add(id);
-  }
+  selectedPopTags.has(id) ? selectedPopTags.delete(id) : selectedPopTags.add(id);
   renderPopTags();
 }
 
 function renderPopAnnotations(idx) {
-  const container = document.getElementById('popAnnotations');
+  const container  = document.getElementById('popAnnotations');
   const phraseAnns = annotations[idx] || {};
   const tagMap = {};
   (sessionMeta.tags || []).forEach(t => { tagMap[t.id] = t; });
 
   const items = Object.entries(phraseAnns);
   if (!items.length) {
-    container.innerHTML = '<div class="pop-no-ann">No annotations for this phrase yet.</div>';
+    container.innerHTML = '<div class="pop-no-ann">No annotations yet.</div>';
     return;
   }
 
-  container.innerHTML = items.map(([studentId, ann]) => {
-    const tagChips = (ann.tags || []).map(tid => {
+  container.innerHTML = items.map(([sid, ann]) => {
+    const tags = (ann.tags || []).map(tid => {
       const tag = tagMap[tid];
-      if (!tag) return '';
-      return `<span class="pop-ann-tag" style="color:${tag.color}">${tag.label}</span>`;
+      return tag ? `<span class="pop-ann-tag" style="color:${tag.color}">${tag.label}</span>` : '';
     }).join('');
-
-    return `<div class="pop-annotation-item">
+    return `<div class="pop-ann-item">
       <div class="pop-ann-header">
-        <div class="pop-ann-name">${escHtml(ann.studentName || 'Anonymous')}</div>
-        <div class="pop-ann-tags">${tagChips}</div>
-        <button class="pop-ann-delete" title="Delete" onclick="deleteAnnotation(${idx}, '${studentId}')">×</button>
+        <div class="pop-ann-name">${escHtml(ann.studentName||'Anonymous')}</div>
+        <div class="pop-ann-tags">${tags}</div>
+        <button class="pop-ann-delete" title="Delete" onclick="deleteAnnotation(${idx},'${sid}')">×</button>
       </div>
       ${ann.note ? `<div class="pop-ann-note">${escHtml(ann.note)}</div>` : ''}
     </div>`;
@@ -1015,25 +957,22 @@ document.addEventListener('click', e => {
   if (!document.getElementById('popover').contains(e.target)) closePopover();
 });
 
-// ── Save / Remove annotation ──────────────────────────────────────────────────
+// ── Save / remove annotation ──────────────────────────────────────────────────
 function saveAnnotation() {
   if (activePhraseIdx === null) return;
   if (!selectedPopTags.size) { alert('Pick at least one tag.'); return; }
-
   const name = getStudentName();
   if (!name) { alert('Please enter your name first.'); return; }
 
   setSyncStatus('syncing');
-  const annotation = {
-    tags: Array.from(selectedPopTags),
-    note: document.getElementById('popNote').value.trim(),
-    studentName: name,
-    studentId: MY_ID,
-    createdAt: Date.now()
-  };
-
   db.ref(`sessions/${SESSION_ID}/annotations/${activePhraseIdx}/${MY_ID}`)
-    .set(annotation)
+    .set({
+      tags: Array.from(selectedPopTags),
+      note: document.getElementById('popNote').value.trim(),
+      studentName: name,
+      studentId: MY_ID,
+      createdAt: Date.now()
+    })
     .then(() => setSyncStatus('connected'))
     .catch(e => { setSyncStatus('error'); console.error(e); });
 
@@ -1044,8 +983,7 @@ function removeMyAnnotation() {
   if (activePhraseIdx === null) return;
   setSyncStatus('syncing');
   db.ref(`sessions/${SESSION_ID}/annotations/${activePhraseIdx}/${MY_ID}`)
-    .remove()
-    .then(() => setSyncStatus('connected'));
+    .remove().then(() => setSyncStatus('connected'));
   closePopover();
 }
 
@@ -1053,8 +991,7 @@ function deleteAnnotation(phraseIdx, studentId) {
   if (!isTeacher) return;
   setSyncStatus('syncing');
   db.ref(`sessions/${SESSION_ID}/annotations/${phraseIdx}/${studentId}`)
-    .remove()
-    .then(() => setSyncStatus('connected'));
+    .remove().then(() => setSyncStatus('connected'));
   renderPopAnnotations(phraseIdx);
 }
 
@@ -1071,11 +1008,10 @@ function exportData() {
   if (!isTeacher) return;
   const tagMap = {};
   (sessionMeta.tags || []).forEach(t => { tagMap[t.id] = t.label; });
-
   const rows = [];
-  Object.entries(annotations).forEach(([phraseIdx, phraseAnns]) => {
-    const phraseText = phrases[parseInt(phraseIdx)] || '';
-    Object.entries(phraseAnns).forEach(([studentId, ann]) => {
+  Object.entries(annotations).forEach(([pIdx, phraseAnns]) => {
+    const phraseText = phrases[parseInt(pIdx)] || '';
+    Object.entries(phraseAnns).forEach(([, ann]) => {
       rows.push({
         phrase: phraseText,
         student: ann.studentName || 'Anonymous',
@@ -1085,8 +1021,10 @@ function exportData() {
       });
     });
   });
-
-  const blob = new Blob([JSON.stringify({ session: sessionMeta, annotations: rows }, null, 2)], { type: 'application/json' });
+  const blob = new Blob(
+    [JSON.stringify({ session: sessionMeta, annotations: rows }, null, 2)],
+    { type: 'application/json' }
+  );
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `close-reader-${SESSION_ID}.json`;

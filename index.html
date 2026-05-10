@@ -5,88 +5,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Close Reader — Create Session</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
   :root {
-    --blk: #1A1A1A;
-    --cream: #F5F0E8;
-    --ora: #FF4D00;
-    --mid: #8A8A8A;
+    --bg:     #FFFFFF;
+    --surface:#F3F3F0;
+    --ink:    #111111;
+    --mid:    #6B6B68;
+    --faint:  #E6E6E2;
+    --border: #CECECA;
+    --red:    #CC1100;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { border-top: 3px solid var(--red); }
+
   body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--blk);
-    color: var(--cream);
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
+  /* ── Header ─────────────────────────────────────────────────────────────── */
   header {
-    padding: 24px 48px;
-    border-bottom: 3px solid var(--ora);
-    display: flex;
-    align-items: flex-end;
-    gap: 32px;
+    padding: 36px 56px 32px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
   }
 
-  .header-brand {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 3px; color: var(--ora);
-    text-transform: uppercase; margin-bottom: 6px;
+  .header-wordmark {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 10px;
   }
 
   .header-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 36px; font-weight: 900;
-    color: var(--cream); line-height: 1;
+    font-size: 42px; font-weight: 800;
+    color: var(--ink); line-height: 1.0;
+    letter-spacing: -0.025em;
   }
 
   .header-sub {
-    font-size: 12px; color: var(--mid);
-    margin-top: 5px; font-style: italic;
+    font-size: 14px; color: var(--mid);
+    margin-top: 10px; font-weight: 400;
+    letter-spacing: -0.005em;
   }
 
+  /* ── Main ───────────────────────────────────────────────────────────────── */
   main {
-    max-width: 860px;
-    margin: 48px auto;
-    padding: 0 48px 80px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 52px 56px 96px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 40px;
   }
 
+  /* ── Form ───────────────────────────────────────────────────────────────── */
   .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 9px;
   }
 
-  label, .field-label {
+  .field-label {
     font-size: 10px; font-weight: 700;
-    letter-spacing: 2.5px; text-transform: uppercase;
+    letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--mid);
   }
 
   input[type="text"], textarea {
-    background: #111;
-    border: 1px solid #2a2a2a;
-    color: var(--cream);
-    padding: 12px 16px;
-    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 11px 14px;
+    font-family: 'Inter', sans-serif;
     font-size: 15px;
     width: 100%;
     outline: none;
     border-radius: 0;
-    transition: border-color 0.15s;
+    transition: border-color 0.12s;
+    -webkit-font-smoothing: antialiased;
   }
 
-  input[type="text"]:focus, textarea:focus { border-color: var(--ora); }
+  input[type="text"]:focus, textarea:focus { border-color: var(--red); }
 
   textarea {
-    min-height: 220px;
+    min-height: 200px;
     resize: vertical;
     line-height: 1.6;
   }
@@ -97,70 +108,74 @@
     gap: 20px;
   }
 
-  /* Tags */
+  hr { border: none; border-top: 1px solid var(--faint); }
+
+  /* ── Tags ───────────────────────────────────────────────────────────────── */
   .tags-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
 
   .tag-chip {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border: 1px solid #2a2a2a;
+    gap: 7px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
     cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    background: #111;
-    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    background: var(--bg);
+    color: var(--ink);
+    transition: all 0.12s;
     user-select: none;
   }
 
-  .tag-chip .chip-dot {
-    width: 8px; height: 8px;
+  .chip-dot {
+    width: 7px; height: 7px;
     border-radius: 50%; flex-shrink: 0;
   }
 
-  .tag-chip.selected { border-color: currentColor; }
-  .tag-chip:not(.selected) { opacity: 0.4; }
+  .tag-chip.selected { background: var(--surface); border-color: var(--ink); }
+  .tag-chip:not(.selected) { opacity: 0.38; }
+  .tag-chip:hover { opacity: 1; }
 
   .custom-tag-row {
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-top: 12px;
+    margin-top: 10px;
   }
 
-  .custom-tag-row input {
-    max-width: 220px;
+  .custom-tag-row input[type="text"] {
+    max-width: 210px;
     padding: 8px 12px;
     font-size: 13px;
   }
 
   .btn-sm {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
     padding: 8px 16px;
     background: none;
-    border: 1px solid #333;
+    border: 1px solid var(--border);
     color: var(--mid);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
     white-space: nowrap;
   }
 
-  .btn-sm:hover { border-color: var(--cream); color: var(--cream); }
+  .btn-sm:hover { border-color: var(--ink); color: var(--ink); }
 
-  /* Preview */
+  /* ── Preview ────────────────────────────────────────────────────────────── */
   .preview-box {
-    background: #0d0d0d;
-    border: 1px solid #2a2a2a;
-    padding: 20px 24px;
-    max-height: 220px;
+    background: var(--surface);
+    border: 1px solid var(--faint);
+    padding: 20px 22px;
+    max-height: 200px;
     overflow-y: auto;
     line-height: 2;
   }
@@ -169,114 +184,110 @@
     display: inline;
     padding: 1px 3px;
     font-size: 14px;
-    border-radius: 1px;
   }
 
-  .preview-phrase:nth-child(odd)  { background: rgba(255,255,255,0.03); }
-  .preview-phrase:nth-child(even) { background: rgba(255,255,255,0.06); }
+  .preview-phrase:nth-child(even) { background: rgba(0,0,0,0.05); }
 
   .preview-count {
     font-size: 11px; color: var(--mid);
-    margin-top: 8px;
+    margin-top: 8px; letter-spacing: 0.04em;
   }
 
-  hr { border: none; border-top: 1px solid #2a2a2a; }
-
-  /* Create button */
+  /* ── Create button ──────────────────────────────────────────────────────── */
   .btn-create {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px; font-weight: 900;
-    letter-spacing: 3px; text-transform: uppercase;
-    padding: 16px 48px;
-    background: var(--ora);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 15px 44px;
+    background: var(--ink);
     border: none;
-    color: var(--blk);
+    color: #FFFFFF;
     cursor: pointer;
     transition: opacity 0.15s;
     align-self: flex-start;
   }
 
-  .btn-create:hover { opacity: 0.85; }
-  .btn-create:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-create:hover { opacity: 0.7; }
+  .btn-create:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* Success panel */
+  /* ── Success panel ──────────────────────────────────────────────────────── */
   .session-created {
     display: none;
     flex-direction: column;
-    gap: 20px;
-    background: #111;
-    border: 1px solid #2a2a2a;
-    padding: 32px;
+    gap: 22px;
+    border-left: 3px solid var(--red);
+    padding: 28px 32px;
+    background: var(--surface);
   }
 
   .session-created.show { display: flex; }
 
   .created-heading {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 22px; font-weight: 900;
-    color: var(--cream);
+    font-size: 22px; font-weight: 800;
+    color: var(--ink); letter-spacing: -0.02em;
   }
 
-  .link-row { display: flex; flex-direction: column; gap: 6px; }
+  .link-row { display: flex; flex-direction: column; gap: 7px; }
 
   .link-label {
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--mid);
   }
 
-  .link-box { display: flex; gap: 8px; align-items: center; }
+  .link-box { display: flex; gap: 8px; align-items: stretch; }
 
   .link-url {
     flex: 1;
-    background: #0a0a0a;
-    border: 1px solid #333;
+    background: var(--bg);
+    border: 1px solid var(--border);
     padding: 10px 14px;
-    font-family: monospace;
-    font-size: 13px;
-    color: var(--ora);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--ink);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    min-width: 0;
   }
 
   .btn-copy {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 10px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 10px 14px;
     background: none;
-    border: 1px solid #333;
+    border: 1px solid var(--border);
     color: var(--mid);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s;
+    transition: all 0.12s;
     flex-shrink: 0;
   }
 
-  .btn-copy:hover { border-color: var(--cream); color: var(--cream); }
+  .btn-copy:hover { border-color: var(--ink); color: var(--ink); }
 
   .btn-open {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 12px 28px;
-    background: var(--ora);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 13px 28px;
+    background: var(--ink);
     border: none;
-    color: var(--blk);
+    color: #FFFFFF;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    margin-top: 4px;
+    margin-top: 2px;
     transition: opacity 0.15s;
     align-self: flex-start;
   }
 
-  .btn-open:hover { opacity: 0.85; }
+  .btn-open:hover { opacity: 0.7; }
 
   .help-note {
-    font-size: 12px; color: var(--mid);
-    font-style: italic; line-height: 1.6;
+    font-size: 13px; color: var(--mid);
+    line-height: 1.65;
   }
 </style>
 </head>
@@ -284,8 +295,8 @@
 
 <header>
   <div>
-    <div class="header-brand">Close Reader</div>
-    <div class="header-title">Create a Reading Session</div>
+    <div class="header-wordmark">Close Reader</div>
+    <div class="header-title">Create a<br>Reading Session</div>
     <div class="header-sub">Upload any text. Students annotate in real time.</div>
   </div>
 </header>
@@ -293,34 +304,34 @@
 <main>
   <div class="two-col">
     <div class="form-group">
-      <label for="titleInput">Reading Title</label>
+      <div class="field-label">Title</div>
       <input type="text" id="titleInput" placeholder="e.g. The Metamorphosis — Opening" />
     </div>
     <div class="form-group">
-      <label for="sourceInput">Author / Source</label>
-      <input type="text" id="sourceInput" placeholder="e.g. Franz Kafka (1915)" />
+      <div class="field-label">Author / Source</div>
+      <input type="text" id="sourceInput" placeholder="e.g. Franz Kafka, 1915" />
     </div>
   </div>
 
   <div class="form-group">
-    <label for="textInput">Paste your text</label>
-    <textarea id="textInput" placeholder="Paste any paragraph, excerpt, or passage. It will be split into phrases that students can click and annotate."></textarea>
+    <div class="field-label">Text</div>
+    <textarea id="textInput" placeholder="Paste any paragraph, excerpt, or passage. It will be automatically split into clickable phrases."></textarea>
   </div>
 
   <div class="form-group">
-    <div class="field-label">Preview — how text will be split into phrases</div>
+    <div class="field-label">Phrase preview</div>
     <div class="preview-box" id="previewBox">
-      <span style="color:#333;font-style:italic;font-size:12px;">Paste text above to see a preview.</span>
+      <span style="color:var(--border);font-size:13px;">Paste text above to see a preview.</span>
     </div>
     <div class="preview-count" id="previewCount"></div>
   </div>
 
   <div class="form-group">
-    <div class="field-label">Available tags — click to toggle</div>
+    <div class="field-label">Tags — click to toggle</div>
     <div class="tags-grid" id="tagsGrid"></div>
     <div class="custom-tag-row">
-      <input type="text" id="customTagInput" placeholder="Add a custom tag..." />
-      <button class="btn-sm" onclick="addCustomTag()">+ Add Tag</button>
+      <input type="text" id="customTagInput" placeholder="Custom tag name..." />
+      <button class="btn-sm" onclick="addCustomTag()">+ Add</button>
     </div>
   </div>
 
@@ -332,7 +343,7 @@
     <div class="created-heading">Session ready.</div>
 
     <div class="link-row">
-      <div class="link-label">Student link — share this with your class</div>
+      <div class="link-label">Student link — share with your class</div>
       <div class="link-box">
         <div class="link-url" id="studentLink"></div>
         <button class="btn-copy" onclick="copyLink('studentLink', this)">Copy</button>
@@ -340,7 +351,7 @@
     </div>
 
     <div class="link-row">
-      <div class="link-label">Teacher link — keep this private (grants full access)</div>
+      <div class="link-label">Teacher link — keep private</div>
       <div class="link-box">
         <div class="link-url" id="teacherLink"></div>
         <button class="btn-copy" onclick="copyLink('teacherLink', this)">Copy</button>
@@ -350,8 +361,7 @@
     <a class="btn-open" id="openSession" target="_blank">Open Teacher View →</a>
 
     <div class="help-note">
-      Students will be asked for their name when they first open the session.
-      All annotations are live — no refresh needed.
+      Students enter their name when they first open the session. All annotations sync live — no refresh needed.
     </div>
   </div>
 </main>
@@ -374,17 +384,17 @@ const db = firebase.database();
 
 // ── Default tags ──────────────────────────────────────────────────────────────
 const DEFAULT_TAGS = [
-  { id: 'confusing',   label: 'Confusing',   color: '#7ab0f5' },
-  { id: 'interesting', label: 'Interesting',  color: '#FF6B35' },
-  { id: 'important',   label: 'Important',    color: '#7fd080' },
-  { id: 'surprising',  label: 'Surprising',   color: '#c9a0f5' },
-  { id: 'question',    label: 'Question',     color: '#f5c842' },
-  { id: 'quotable',    label: 'Quotable',     color: '#f5a08a' },
-  { id: 'agree',       label: 'Agree',        color: '#5fd0c0' },
-  { id: 'disagree',    label: 'Disagree',     color: '#e07070' },
+  { id: 'confusing',   label: 'Confusing',   color: '#2563EB' },
+  { id: 'interesting', label: 'Interesting',  color: '#EA580C' },
+  { id: 'important',   label: 'Important',    color: '#16A34A' },
+  { id: 'surprising',  label: 'Surprising',   color: '#7C3AED' },
+  { id: 'question',    label: 'Question',     color: '#CA8A04' },
+  { id: 'quotable',    label: 'Quotable',     color: '#0891B2' },
+  { id: 'agree',       label: 'Agree',        color: '#059669' },
+  { id: 'disagree',    label: 'Disagree',     color: '#DC2626' },
 ];
 
-const CUSTOM_COLORS = ['#e0c97a', '#a0c8f5', '#f5a0d0', '#b0e0a0', '#f0d0a0', '#a0e0d0'];
+const CUSTOM_COLORS = ['#B45309','#6D28D9','#0369A1','#065F46','#9D174D','#1E3A5F'];
 
 let selectedTags = new Set(DEFAULT_TAGS.map(t => t.id));
 let customTags = [];
@@ -398,7 +408,6 @@ function renderTagsGrid() {
   grid.innerHTML = getAllTags().map(tag => {
     const sel = selectedTags.has(tag.id);
     return `<div class="tag-chip ${sel ? 'selected' : ''}"
-      style="color:${tag.color}"
       onclick="toggleTag('${tag.id}')">
       <span class="chip-dot" style="background:${tag.color}"></span>
       ${tag.label}
@@ -438,32 +447,23 @@ function splitText(raw) {
 
   const paragraphs = raw.split(/\n\s*\n/).filter(p => p.trim());
 
-  // If multiple paragraphs, split by paragraph
   if (paragraphs.length > 1) {
     return paragraphs.map(p => p.replace(/\s+/g, ' ').trim()).filter(Boolean);
   }
 
-  // Single block: split by sentence
   const text = raw.replace(/\s+/g, ' ').trim();
   const results = [];
-  let i = 0;
-  let start = 0;
+  let i = 0, start = 0;
 
   while (i < text.length) {
-    const ch = text[i];
-    if (/[.!?]/.test(ch)) {
-      // Consume trailing punctuation (e.g. "..." or "?!")
+    if (/[.!?]/.test(text[i])) {
       let end = i;
       while (end + 1 < text.length && /[.!?]/.test(text[end + 1])) end++;
-      // Consume optional closing quote
-      if (end + 1 < text.length && /["'”’]/.test(text[end + 1])) end++;
-
+      if (end + 1 < text.length && /["'"']/.test(text[end + 1])) end++;
       const ahead = text.slice(end + 1);
-      // Sentence boundary: whitespace followed by uppercase or end of string
-      if (ahead === '' || /^\s+[A-Z“‘"']/.test(ahead)) {
+      if (ahead === '' || /^\s+[A-Z"'"']/.test(ahead)) {
         const phrase = text.slice(start, end + 1).trim();
         if (phrase) results.push(phrase);
-        // Skip whitespace
         i = end + 1;
         while (i < text.length && /\s/.test(text[i])) i++;
         start = i;
@@ -486,13 +486,11 @@ function renderPreview() {
   const box = document.getElementById('previewBox');
   const count = document.getElementById('previewCount');
   if (!phrases.length) {
-    box.innerHTML = '<span style="color:#333;font-style:italic;font-size:12px;">Paste text above to see a preview.</span>';
+    box.innerHTML = '<span style="color:var(--border);font-size:13px;">Paste text above to see a preview.</span>';
     count.textContent = '';
     return;
   }
-  box.innerHTML = phrases.map(p =>
-    `<span class="preview-phrase">${p} </span>`
-  ).join('');
+  box.innerHTML = phrases.map(p => `<span class="preview-phrase">${p} </span>`).join('');
   count.textContent = `${phrases.length} phrase${phrases.length !== 1 ? 's' : ''}`;
 }
 
@@ -520,7 +518,6 @@ async function createSession() {
   if (!phrases.length) { alert('Could not parse text into phrases.'); return; }
 
   const activeTags = getAllTags().filter(t => selectedTags.has(t.id));
-
   const sessionId    = genCode();
   const teacherToken = genToken();
 
@@ -545,7 +542,7 @@ async function createSession() {
     document.getElementById('openSession').href = teacherUrl;
     document.getElementById('sessionCreated').classList.add('show');
     document.getElementById('sessionCreated').scrollIntoView({ behavior: 'smooth' });
-    btn.textContent = 'Create Another Session →';
+    btn.textContent = 'Create Another →';
     btn.disabled = false;
   } catch (e) {
     alert('Error: ' + e.message);
