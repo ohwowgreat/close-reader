@@ -156,9 +156,34 @@
   .btn-join:hover { opacity: 0.7; }
   .btn-join:disabled { opacity: 0.3; cursor: not-allowed; }
 
+  .landing-divider {
+    border: none; border-top: 1px solid var(--faint);
+    margin: 28px 0;
+  }
+  .landing-how {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .how-step {
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .how-num {
+    font-size: 22px; font-weight: 800; color: var(--red);
+    letter-spacing: -0.03em; line-height: 1; flex-shrink: 0;
+    width: 24px;
+  }
+  .how-text {
+    font-size: 13px; color: var(--mid); line-height: 1.65;
+    padding-top: 3px;
+  }
+  .how-text strong { color: var(--ink); font-weight: 600; }
+
   .landing-note {
     font-size: 12px; color: var(--mid);
     margin-top: 18px; line-height: 1.7;
+  }
+  .sidebar-hint {
+    font-size: 11px; color: var(--border);
+    margin-top: 8px; line-height: 1.6;
   }
 
   /* ── Room view layout ──────────────────────────────────────────────────────── */
@@ -272,44 +297,31 @@
     border-right: 1px solid var(--border);
     overflow-y: auto;
   }
-  .reading-meta { margin-bottom: 32px; }
+  .reading-meta { margin-bottom: 36px; }
   .reading-title {
-    font-size: 28px; font-weight: 800;
-    letter-spacing: -0.02em; line-height: 1.15;
-    margin-bottom: 6px;
+    font-size: 36px; font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 8px;
   }
   .reading-source {
-    font-size: 13px; color: var(--mid); font-style: italic;
+    font-size: 16px; color: var(--mid); font-style: italic;
   }
 
   #phrasesContainer {
-    line-height: 2.5;
-    font-size: 18px;
+    line-height: 2.8;
+    font-size: 26px;
   }
   .phrase-wrap { display: inline; }
   .phrase {
     display: inline;
     cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 2px;
-    transition: background 0.12s;
+    padding: 3px 5px;
+    border-radius: 3px;
+    transition: filter 0.1s;
     position: relative;
   }
-  .phrase:hover { background: var(--surface); }
-  .phrase.active { background: #FEF3C7; }
-  .phrase.annotated { border-bottom: 2px solid var(--red); }
-
-  .phrase-dots {
-    display: inline-flex; gap: 2px;
-    vertical-align: super;
-    font-size: 0;
-    margin-left: 2px;
-  }
-  .pdot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    display: inline-block;
-  }
+  .phrase:hover { filter: brightness(0.88); }
+  .phrase.active { outline: 3px solid var(--ink); outline-offset: 2px; }
 
   .empty-state {
     color: var(--mid); font-size: 15px;
@@ -347,9 +359,6 @@
     letter-spacing: 0.07em; text-transform: uppercase;
     background: var(--bg); color: var(--mid);
     transition: all 0.1s; user-select: none;
-  }
-  .ann-tag.sel {
-    background: var(--ink); color: #fff; border-color: var(--ink);
   }
   .ann-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
@@ -462,9 +471,21 @@
 
   <button class="btn-join" id="joinBtn" onclick="joinRoom()">Enter Room →</button>
 
-  <div class="landing-note">
-    Teachers: check the box above, enter any password to create the room.<br>
-    Students: just enter the room code and your name.
+  <hr class="landing-divider" />
+
+  <div class="landing-how">
+    <div class="how-step">
+      <div class="how-num">1</div>
+      <div class="how-text"><strong>Teacher</strong> checks "I'm the teacher," picks a room code (e.g. <em>HIST101</em>), sets a password, and joins. A panel opens to paste text and publish the reading.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">2</div>
+      <div class="how-text"><strong>Students</strong> go to this same page, type the room code and their name, and join — no password needed.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">3</div>
+      <div class="how-text">Click any phrase to tag it. Highlights appear live for everyone in the room.</div>
+    </div>
   </div>
 </div>
 
@@ -525,7 +546,8 @@
   <!-- sidebar -->
   <div id="sidebar">
     <div class="sidebar-prompt" id="sidebarPrompt">
-      Click any phrase in the text to annotate it.
+      Click any phrase in the text to tag it.
+      <div class="sidebar-hint">Select one or more tags, add an optional note, and hit Save. Your annotation is visible to everyone instantly.</div>
     </div>
     <div id="annotationForm" style="display:none">
       <div class="ann-phrase-text" id="annPhraseText"></div>
@@ -738,7 +760,7 @@ function subscribeRoom() {
   // annotations
   db.ref(`rooms/${ROOM_ID}/annotations`).on('value', snap => {
     allAnnotations = snap.val() || {};
-    renderPhraseDots();
+    renderPhraseHighlights();
     if (activePhraseIdx !== null) renderClassAnns(activePhraseIdx);
   });
 }
@@ -751,35 +773,45 @@ function renderPhrases() {
     return;
   }
   container.innerHTML = currentPhrases.map((p, i) => {
-    return `<span class="phrase-wrap"><span class="phrase" id="ph${i}" onclick="selectPhrase(${i})">${escHtml(p)}</span><span class="phrase-dots" id="pd${i}"></span> </span>`;
+    return `<span class="phrase" id="ph${i}" onclick="selectPhrase(${i})">${escHtml(p)}</span> `;
   }).join('');
-  renderPhraseDots();
+  renderPhraseHighlights();
 }
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function renderPhraseDots() {
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function renderPhraseHighlights() {
+  const tagMap = {};
+  currentTags.forEach(t => { tagMap[t.id] = t; });
+
   currentPhrases.forEach((_, i) => {
-    const dotsEl = document.getElementById(`pd${i}`);
-    if (!dotsEl) return;
+    const ph = document.getElementById(`ph${i}`);
+    if (!ph) return;
     const anns = allAnnotations[i] || {};
     const tagCounts = {};
     Object.values(anns).forEach(a => {
       (a.tags || []).forEach(tid => { tagCounts[tid] = (tagCounts[tid] || 0) + 1; });
     });
-    const tagMap = {};
-    currentTags.forEach(t => { tagMap[t.id] = t; });
-    const dots = Object.entries(tagCounts).map(([tid]) => {
-      const color = tagMap[tid] ? tagMap[tid].color : '#888';
-      return `<span class="pdot" style="background:${color}" title="${tid}"></span>`;
-    }).join('');
-    dotsEl.innerHTML = dots;
 
-    const ph = document.getElementById(`ph${i}`);
-    if (ph) {
-      ph.classList.toggle('annotated', Object.keys(anns).length > 0);
+    const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+    if (!sorted.length) {
+      ph.style.backgroundColor = '';
+      ph.style.color = '';
+    } else {
+      const tag = tagMap[sorted[0][0]];
+      if (tag) {
+        ph.style.backgroundColor = hexToRgba(tag.color, 0.22);
+        ph.style.color = tag.color;
+      }
     }
   });
 }
@@ -814,8 +846,12 @@ function renderAnnTags() {
   const grid = document.getElementById('annTagsGrid');
   grid.innerHTML = currentTags.map(tag => {
     const sel = selectedAnnTags.has(tag.id);
-    return `<div class="ann-tag ${sel ? 'sel' : ''}" onclick="toggleAnnTag('${tag.id}')">
-      <span class="ann-dot" style="background:${tag.color}"></span>
+    const style = sel
+      ? `background:${tag.color};border-color:${tag.color};color:#fff`
+      : '';
+    const dotStyle = sel ? 'background:rgba(255,255,255,0.55)' : `background:${tag.color}`;
+    return `<div class="ann-tag" style="${style}" onclick="toggleAnnTag('${tag.id}')">
+      <span class="ann-dot" style="${dotStyle}"></span>
       ${escHtml(tag.label)}
     </div>`;
   }).join('');
