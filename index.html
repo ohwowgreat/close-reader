@@ -310,18 +310,27 @@
   #phrasesContainer {
     line-height: 2.8;
     font-size: 26px;
+    user-select: none;
   }
-  .phrase-wrap { display: inline; }
-  .phrase {
+  .word {
     display: inline;
     cursor: pointer;
-    padding: 3px 5px;
-    border-radius: 3px;
-    transition: filter 0.1s;
-    position: relative;
+    padding: 2px 1px;
+    border-radius: 2px;
+    transition: background-color 0.1s, color 0.1s;
   }
-  .phrase:hover { filter: brightness(0.88); }
-  .phrase.active { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .word:hover { filter: brightness(0.85); }
+  .word.selecting {
+    background-color: rgba(59, 130, 246, 0.22);
+    color: var(--ink);
+    border-radius: 2px;
+  }
+  .word.active {
+    text-decoration: underline;
+    text-decoration-color: var(--ink);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+  }
 
   .empty-state {
     color: var(--mid); font-size: 15px;
@@ -484,7 +493,7 @@
     </div>
     <div class="how-step">
       <div class="how-num">3</div>
-      <div class="how-text">Click any phrase to tag it. Highlights appear live for everyone in the room.</div>
+      <div class="how-text">Click or drag to select any word, phrase, or sentence and tag it. Highlights appear live for everyone in the room.</div>
     </div>
   </div>
 </div>
@@ -546,7 +555,7 @@
   <!-- sidebar -->
   <div id="sidebar">
     <div class="sidebar-prompt" id="sidebarPrompt">
-      Click any phrase in the text to tag it.
+      Click or drag to select any word, phrase, or sentence.
       <div class="sidebar-hint">Select one or more tags, add an optional note, and hit Save. Your annotation is visible to everyone instantly.</div>
     </div>
     <div id="annotationForm" style="display:none">
@@ -588,9 +597,15 @@ let IS_TEACHER = false;
 
 let currentPhrases  = [];
 let currentTags     = [];
-let activePhraseIdx = null;
 let selectedAnnTags = new Set();
 let allAnnotations  = {};
+
+// drag-select state
+let wordElements   = []; // [{text, phraseIdx}]
+let dragStartWidx  = null;
+let dragEndWidx    = null;
+let isDragging     = false;
+let activeSelection = null; // { start, end, text }
 
 // edit-panel state
 const DEFAULT_TAGS = [
@@ -733,6 +748,7 @@ function enterRoom() {
     renderEpTagsGrid();
   }
 
+  setupWordEvents();
   setSyncStatus('wait');
   subscribeRoom();
 }
@@ -760,8 +776,10 @@ function subscribeRoom() {
   // annotations
   db.ref(`rooms/${ROOM_ID}/annotations`).on('value', snap => {
     allAnnotations = snap.val() || {};
-    renderPhraseHighlights();
-    if (activePhraseIdx !== null) renderClassAnns(activePhraseIdx);
+    renderHighlights();
+    if (activeSelection) {
+      renderClassAnns(`${activeSelection.start}-${activeSelection.end}`);
+    }
   });
 }
 
@@ -770,12 +788,26 @@ function renderPhrases() {
   const container = document.getElementById('phrasesContainer');
   if (!currentPhrases.length) {
     container.innerHTML = '<div class="empty-state">Waiting for the teacher to publish a reading.</div>';
+    wordElements = [];
     return;
   }
-  container.innerHTML = currentPhrases.map((p, i) => {
-    return `<span class="phrase" id="ph${i}" onclick="selectPhrase(${i})">${escHtml(p)}</span> `;
-  }).join('');
-  renderPhraseHighlights();
+
+  wordElements = [];
+  let globalWidx = 0;
+  const parts = [];
+
+  currentPhrases.forEach((phrase, phraseIdx) => {
+    const words = phrase.match(/\S+/g) || [];
+    words.forEach(word => {
+      wordElements.push({ text: word, phraseIdx });
+      parts.push(`<span class="word" id="w${globalWidx}" data-widx="${globalWidx}">${escHtml(word)}</span>`);
+      globalWidx++;
+    });
+    parts.push(' ');
+  });
+
+  container.innerHTML = parts.join('');
+  renderHighlights();
 }
 
 function escHtml(s) {
@@ -789,57 +821,139 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function renderPhraseHighlights() {
+function renderHighlights() {
   const tagMap = {};
   currentTags.forEach(t => { tagMap[t.id] = t; });
 
-  currentPhrases.forEach((_, i) => {
-    const ph = document.getElementById(`ph${i}`);
-    if (!ph) return;
-    const anns = allAnnotations[i] || {};
+  // Build per-word dominant tag from all annotation ranges
+  const wordTag = {}; // widx -> { tag, count }
+
+  Object.entries(allAnnotations).forEach(([key, studentAnns]) => {
+    const parts = key.split('-');
+    if (parts.length !== 2) return;
+    const start = parseInt(parts[0], 10);
+    const end   = parseInt(parts[1], 10);
+    if (isNaN(start) || isNaN(end)) return;
+
     const tagCounts = {};
-    Object.values(anns).forEach(a => {
-      (a.tags || []).forEach(tid => { tagCounts[tid] = (tagCounts[tid] || 0) + 1; });
+    Object.values(studentAnns).forEach(ann => {
+      (ann.tags || []).forEach(tid => { tagCounts[tid] = (tagCounts[tid] || 0) + 1; });
     });
 
     const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
-    if (!sorted.length) {
-      ph.style.backgroundColor = '';
-      ph.style.color = '';
-    } else {
-      const tag = tagMap[sorted[0][0]];
-      if (tag) {
-        ph.style.backgroundColor = hexToRgba(tag.color, 0.22);
-        ph.style.color = tag.color;
+    if (!sorted.length) return;
+    const dominantTag = tagMap[sorted[0][0]];
+    if (!dominantTag) return;
+    const count = Object.keys(studentAnns).length;
+
+    for (let w = start; w <= end; w++) {
+      if (!wordTag[w] || wordTag[w].count < count) {
+        wordTag[w] = { tag: dominantTag, count };
       }
     }
   });
+
+  for (let w = 0; w < wordElements.length; w++) {
+    const el = document.getElementById(`w${w}`);
+    if (!el) continue;
+    const entry = wordTag[w];
+    if (entry) {
+      el.style.backgroundColor = hexToRgba(entry.tag.color, 0.22);
+      el.style.color = entry.tag.color;
+    } else {
+      el.style.backgroundColor = '';
+      el.style.color = '';
+    }
+  }
 }
 
-// ── Phrase selection ──────────────────────────────────────────────────────────
-function selectPhrase(idx) {
-  // deselect old
-  if (activePhraseIdx !== null) {
-    const old = document.getElementById(`ph${activePhraseIdx}`);
-    if (old) old.classList.remove('active');
+// ── Range selection ───────────────────────────────────────────────────────────
+function selectRange(start, end, text) {
+  // deselect previous active words
+  if (activeSelection) {
+    for (let w = activeSelection.start; w <= activeSelection.end; w++) {
+      const el = document.getElementById(`w${w}`);
+      if (el) el.classList.remove('active');
+    }
   }
-  activePhraseIdx = idx;
-  const el = document.getElementById(`ph${idx}`);
-  if (el) el.classList.add('active');
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  activeSelection = { start, end, text };
+
+  // mark new active words
+  for (let w = start; w <= end; w++) {
+    const el = document.getElementById(`w${w}`);
+    if (el) el.classList.add('active');
+  }
 
   // show annotation form
   document.getElementById('sidebarPrompt').style.display = 'none';
   document.getElementById('annotationForm').style.display = 'block';
-  document.getElementById('annPhraseText').textContent = currentPhrases[idx];
+  document.getElementById('annPhraseText').textContent = text;
 
-  // pre-fill from MY previous annotation
-  const myAnn = (allAnnotations[idx] || {})[MY_ID];
+  // pre-fill from MY previous annotation on this exact range
+  const selKey = `${start}-${end}`;
+  const myAnn = (allAnnotations[selKey] || {})[MY_ID];
   selectedAnnTags = new Set(myAnn ? myAnn.tags : []);
   document.getElementById('annNote').value = myAnn ? (myAnn.note || '') : '';
 
   renderAnnTags();
-  renderClassAnns(idx);
+  renderClassAnns(selKey);
+}
+
+// ── Word drag events ──────────────────────────────────────────────────────────
+function setupWordEvents() {
+  const container = document.getElementById('phrasesContainer');
+
+  container.addEventListener('mousedown', function(e) {
+    const word = e.target.closest('[data-widx]');
+    if (!word) return;
+    e.preventDefault();
+    const widx = parseInt(word.dataset.widx, 10);
+    dragStartWidx = widx;
+    dragEndWidx   = widx;
+    isDragging    = true;
+    applySelectingClass(widx, widx);
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const word = el && el.closest('[data-widx]');
+    if (!word) return;
+    const widx = parseInt(word.dataset.widx, 10);
+    if (!isNaN(widx) && widx !== dragEndWidx) {
+      dragEndWidx = widx;
+      applySelectingClass(dragStartWidx, dragEndWidx);
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (!isDragging) return;
+    isDragging = false;
+    clearSelectingClass();
+    if (dragStartWidx !== null && dragEndWidx !== null) {
+      const start = Math.min(dragStartWidx, dragEndWidx);
+      const end   = Math.max(dragStartWidx, dragEndWidx);
+      const text  = wordElements.slice(start, end + 1).map(w => w.text).join(' ');
+      selectRange(start, end, text);
+    }
+    dragStartWidx = null;
+    dragEndWidx   = null;
+  });
+}
+
+function applySelectingClass(startWidx, currentWidx) {
+  clearSelectingClass();
+  const start = Math.min(startWidx, currentWidx);
+  const end   = Math.max(startWidx, currentWidx);
+  for (let w = start; w <= end; w++) {
+    const el = document.getElementById(`w${w}`);
+    if (el) el.classList.add('selecting');
+  }
+}
+
+function clearSelectingClass() {
+  document.querySelectorAll('.word.selecting').forEach(el => el.classList.remove('selecting'));
 }
 
 function renderAnnTags() {
@@ -863,9 +977,9 @@ function toggleAnnTag(id) {
   renderAnnTags();
 }
 
-function renderClassAnns(idx) {
+function renderClassAnns(selKey) {
   const container = document.getElementById('classAnns');
-  const anns = allAnnotations[idx] || {};
+  const anns = allAnnotations[selKey] || {};
   const entries = Object.entries(anns);
   if (!entries.length) { container.innerHTML = ''; return; }
 
@@ -893,10 +1007,14 @@ function renderClassAnns(idx) {
 
 // ── Save annotation ───────────────────────────────────────────────────────────
 async function saveAnnotation() {
-  if (activePhraseIdx === null) return;
+  if (!activeSelection) return;
   if (!selectedAnnTags.size) { alert('Select at least one tag.'); return; }
 
+  const selKey = `${activeSelection.start}-${activeSelection.end}`;
   const annotation = {
+    text: activeSelection.text,
+    startWidx: activeSelection.start,
+    endWidx: activeSelection.end,
     tags: [...selectedAnnTags],
     note: document.getElementById('annNote').value.trim(),
     studentName: MY_NAME,
@@ -904,7 +1022,7 @@ async function saveAnnotation() {
   };
 
   try {
-    await db.ref(`rooms/${ROOM_ID}/annotations/${activePhraseIdx}/${MY_ID}`).set(annotation);
+    await db.ref(`rooms/${ROOM_ID}/annotations/${selKey}/${MY_ID}`).set(annotation);
     setSyncStatus('ok');
   } catch (e) {
     setSyncStatus('err');
