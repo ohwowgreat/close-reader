@@ -47,6 +47,36 @@
     gap: 14px;
   }
   .header-room.show { display: flex; }
+  .font-size-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .font-size-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 4px 9px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.12s;
+    line-height: 1;
+  }
+  .font-size-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-exit {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 4px 12px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .btn-exit:hover { border-color: var(--red); color: var(--red); }
   .room-code-badge {
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
@@ -449,6 +479,11 @@
   <div class="header-room" id="headerRoom">
     <div class="room-code-badge">Room<span id="headerCode"></span></div>
     <div class="sync-pill" id="syncPill">Live</div>
+    <div class="font-size-controls">
+      <button class="font-size-btn" onclick="changeFontSize(-2)">A−</button>
+      <button class="font-size-btn" onclick="changeFontSize(2)">A+</button>
+    </div>
+    <button class="btn-exit" onclick="exitRoom()">Exit</button>
   </div>
 </header>
 
@@ -1121,12 +1156,64 @@ async function exportData() {
   URL.revokeObjectURL(url);
 }
 
+// ── Font size ─────────────────────────────────────────────────────────────────
+const FONT_SIZE_MIN = 14;
+const FONT_SIZE_MAX = 40;
+let currentFontSize = parseInt(localStorage.getItem('closereader_fontsize') || '26', 10);
+
+function applyFontSize() {
+  document.getElementById('phrasesContainer').style.fontSize = currentFontSize + 'px';
+}
+
+function changeFontSize(delta) {
+  currentFontSize = Math.min(FONT_SIZE_MAX, Math.max(FONT_SIZE_MIN, currentFontSize + delta));
+  localStorage.setItem('closereader_fontsize', currentFontSize);
+  applyFontSize();
+}
+
+// ── Exit room ─────────────────────────────────────────────────────────────────
+function exitRoom() {
+  // detach Firebase listeners
+  if (ROOM_ID) {
+    db.ref(`rooms/${ROOM_ID}/content`).off();
+    db.ref(`rooms/${ROOM_ID}/annotations`).off();
+  }
+
+  // reset state
+  ROOM_ID = null; MY_ID = null; MY_NAME = null; IS_TEACHER = false;
+  currentPhrases = []; currentTags = []; allAnnotations = {};
+  wordElements = []; activeSelection = null;
+  isDragging = false; dragStartWidx = null; dragEndWidx = null;
+  selectedAnnTags = new Set();
+
+  // reset UI
+  document.getElementById('roomView').classList.remove('active');
+  document.getElementById('headerRoom').classList.remove('show');
+  document.getElementById('epToggle').classList.remove('show');
+  document.getElementById('editPanel').classList.remove('open');
+  document.getElementById('teacherTools').style.display = 'none';
+  document.getElementById('annotationForm').style.display = 'none';
+  document.getElementById('sidebarPrompt').style.display = 'block';
+  document.getElementById('classAnns').innerHTML = '';
+  document.getElementById('phrasesContainer').innerHTML =
+    '<div class="empty-state">Waiting for the teacher to publish a reading.</div>';
+  document.getElementById('readingTitle').textContent = 'Loading…';
+  document.getElementById('readingSource').textContent = '';
+  document.getElementById('inTeacher').checked = false;
+  document.getElementById('pwGroup').classList.remove('show');
+  document.getElementById('joinBtn').disabled = false;
+  document.getElementById('joinBtn').textContent = 'Enter Room →';
+
+  document.getElementById('landingView').classList.add('active');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 (function init() {
   const savedCode = localStorage.getItem('closereader_room');
   const savedName = localStorage.getItem('closereader_name');
   if (savedCode) document.getElementById('inCode').value = savedCode;
   if (savedName) document.getElementById('inName').value = savedName;
+  applyFontSize();
 })();
 </script>
 </body>
