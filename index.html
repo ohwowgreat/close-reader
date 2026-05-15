@@ -800,10 +800,9 @@ function renderPhrases() {
     const words = phrase.match(/\S+/g) || [];
     words.forEach(word => {
       wordElements.push({ text: word, phraseIdx });
-      parts.push(`<span class="word" id="w${globalWidx}" data-widx="${globalWidx}">${escHtml(word)}</span>`);
+      parts.push(`<span class="word" id="w${globalWidx}" data-widx="${globalWidx}">${escHtml(word)}</span> `);
       globalWidx++;
     });
-    parts.push(' ');
   });
 
   container.innerHTML = parts.join('');
