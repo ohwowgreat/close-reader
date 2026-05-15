@@ -602,6 +602,7 @@
     <div id="classAnns"></div>
     <div class="teacher-tools" id="teacherTools" style="display:none">
       <button class="btn-export" onclick="exportData()">Export JSON</button>
+      <button class="btn-export" onclick="exportPDF()">Export PDF</button>
     </div>
   </div>
 </div>
@@ -1154,6 +1155,104 @@ async function exportData() {
   const a    = Object.assign(document.createElement('a'), { href: url, download: `closereader-${ROOM_ID}.json` });
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Export PDF ────────────────────────────────────────────────────────────────
+function exportPDF() {
+  const tagMap = {};
+  currentTags.forEach(t => { tagMap[t.id] = t; });
+
+  // Build per-word highlight map (same logic as renderHighlights)
+  const wordTag = {};
+  Object.entries(allAnnotations).forEach(([key, studentAnns]) => {
+    const p = key.split('-');
+    if (p.length !== 2) return;
+    const start = parseInt(p[0], 10), end = parseInt(p[1], 10);
+    if (isNaN(start) || isNaN(end)) return;
+    const tagCounts = {};
+    Object.values(studentAnns).forEach(ann => {
+      (ann.tags || []).forEach(tid => { tagCounts[tid] = (tagCounts[tid] || 0) + 1; });
+    });
+    const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+    if (!sorted.length) return;
+    const dominantTag = tagMap[sorted[0][0]];
+    if (!dominantTag) return;
+    const count = Object.keys(studentAnns).length;
+    for (let w = start; w <= end; w++) {
+      if (!wordTag[w] || wordTag[w].count < count) wordTag[w] = { tag: dominantTag, count };
+    }
+  });
+
+  // Annotated text HTML
+  const textHtml = wordElements.map((we, widx) => {
+    const entry = wordTag[widx];
+    if (entry) {
+      const bg = hexToRgba(entry.tag.color, 0.22);
+      return `<span style="background:${bg};color:${entry.tag.color};padding:1px 3px;border-radius:2px">${escHtml(we.text)}</span>`;
+    }
+    return escHtml(we.text);
+  }).join(' ');
+
+  // Annotations list sorted by position
+  const annEntries = Object.entries(allAnnotations).map(([key, studentAnns]) => {
+    const p = key.split('-');
+    if (p.length !== 2) return null;
+    const start = parseInt(p[0], 10), end = parseInt(p[1], 10);
+    if (isNaN(start) || isNaN(end)) return null;
+    const text = wordElements.slice(start, end + 1).map(w => w.text).join(' ');
+    return { start, text, studentAnns };
+  }).filter(Boolean).sort((a, b) => a.start - b.start);
+
+  const annsHtml = annEntries.map(({ text, studentAnns }) => {
+    const studentItems = Object.values(studentAnns).map(a => {
+      const pills = (a.tags || []).map(tid => {
+        const t = tagMap[tid];
+        if (!t) return '';
+        return `<span style="border:1px solid ${t.color};color:${t.color};padding:1px 7px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-right:4px;display:inline-block">${escHtml(t.label)}</span>`;
+      }).join('');
+      const note = a.note ? `<p style="margin:5px 0 0;font-size:13px;color:#222220">${escHtml(a.note)}</p>` : '';
+      return `<div style="margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#7A7A76;margin-bottom:4px">${escHtml(a.studentName || 'Anonymous')}</div>
+        <div>${pills}</div>${note}
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #E0DFD9">
+      <div style="margin:0 0 10px;padding:10px 14px;background:#EEEDE8;border-left:3px solid #C8C7C1;font-size:15px;font-weight:600;line-height:1.5;color:#222220">${escHtml(text)}</div>
+      ${studentItems}
+    </div>`;
+  }).join('');
+
+  const title  = document.getElementById('readingTitle').textContent;
+  const source = document.getElementById('readingSource').textContent;
+  const date   = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const html = `<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>${escHtml(title)} — Close Reader</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;color:#222220;padding:48px;max-width:820px;margin:0 auto}
+  h1{font-size:28px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px}
+  .source{font-size:14px;color:#7A7A76;font-style:italic;margin-bottom:4px}
+  .meta{font-size:10px;color:#7A7A76;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:40px}
+  .label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#7A7A76;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #C8C7C1}
+  .text{font-size:17px;line-height:2.0;margin-bottom:52px}
+  @media print{body{padding:24px}}
+</style>
+</head><body>
+<h1>${escHtml(title)}</h1>
+${source ? `<div class="source">${escHtml(source)}</div>` : ''}
+<div class="meta">Room ${escHtml(ROOM_ID)} &nbsp;·&nbsp; ${escHtml(date)}</div>
+<div class="label">Reading</div>
+<div class="text">${textHtml}</div>
+<div class="label">Annotations (${annEntries.length})</div>
+<div>${annsHtml || '<p style="color:#7A7A76;font-size:13px">No annotations yet.</p>'}</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.addEventListener('load', () => win.print());
 }
 
 // ── Font size ─────────────────────────────────────────────────────────────────
